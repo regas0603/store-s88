@@ -1,0 +1,37 @@
+{
+  "targets": [
+    {
+      "name": "prod",
+      "rs_domain": "https://rs.static607zgn.com/",
+      "api_domain": "https://raw.githubusercontent.com/Vulcan-dev-25/configs/main/apps/api_test.json?",
+      "ssh": {
+        "host": "54.255.37.84",
+        "port": 22000,
+        "user": "msservice",
+        "path": "/home/msservice/prod/commons/"
+      }
+    },
+    {
+      "name": "pre",
+      "rs_domain": "https://rs.static607zgn.com/pre/",
+      "api_domain": "https://raw.githubusercontent.com/Vulcan-dev-25/configs/main/apps/api_test.json?",
+      "ssh": {
+        "host": "54.255.37.84",
+        "port": 22000,
+        "user": "msservice",
+        "path": "/home/msservice/prod/commons/pre/"
+      }
+    },
+    {
+      "name": "staging",
+      "rs_domain": "https://common-s88.sandboxg1.win/",
+      "api_domain": "https://raw.githubusercontent.com/Vulcan-dev-25/configs/main/apps/api_test.json?",
+      "ssh": {
+        "host": "54.255.37.84",
+        "port": 22000,
+        "user": "msservice",
+        "path": "/home/msservice/staging/commons/"
+      }
+    }
+  ]
+}

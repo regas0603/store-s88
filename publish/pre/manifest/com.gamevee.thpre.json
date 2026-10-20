@@ -1,0 +1,12 @@
+{
+  "bundle": "com.gamevee.thpre",
+  "generated_at": "2026-10-13T12:53:28Z",
+  "hosts": {
+    "com.gamevee.thpre": {}
+  },
+  "latest": 1,
+  "min_allowed_patch": 0,
+  "patches": {},
+  "schema": 1,
+  "soft_prompt_interval_hours": 24
+}

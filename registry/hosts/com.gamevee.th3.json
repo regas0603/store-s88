@@ -1,0 +1,23 @@
+{
+  "builds": [
+    {
+      "abi_id": "9020d32f311b99da",
+      "built_at": "2026-10-16T09:45:50Z",
+      "git_rev": "7a21b57",
+      "mode": "ddm",
+      "platform": "android",
+      "version_code": 2,
+      "version_name": "1.0.2"
+    },
+    {
+      "abi_id": "1982e55c20754eb5",
+      "built_at": "2026-10-13T08:25:46Z",
+      "git_rev": "debe3943",
+      "mode": "adhoc",
+      "platform": "ios",
+      "version_code": 1,
+      "version_name": "1.0.1"
+    }
+  ],
+  "bundle_id": "com.gamevee.th3"
+}

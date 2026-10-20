@@ -1,0 +1,40 @@
+{
+  "bundle": "com.gamevee.th3",
+  "generated_at": "2026-10-16T09:55:52Z",
+  "hosts": {
+    "com.gamevee.th3": {
+      "android": {
+        "2": {
+          "patch": 4
+        }
+      },
+      "ios": {
+        "1": {
+          "patch": 1
+        }
+      }
+    }
+  },
+  "latest": 4,
+  "min_allowed_patch": 0,
+  "patches": {
+    "1": {
+      "file": "app_content_df601514.bytecode",
+      "gz_file": "app_content_df601514.bytecode.gz",
+      "gz_size": 3053120,
+      "hash": "df60151499cd6accaac84d4b418cebe3678c608572e3d3c4243d2a7ce4f74559",
+      "min_force_update": 0,
+      "size": 8159762
+    },
+    "4": {
+      "file": "app_content_9213fc95.bytecode",
+      "gz_file": "app_content_9213fc95.bytecode.gz",
+      "gz_size": 3083450,
+      "hash": "9213fc95957e02f7c8cba1d4b56183ff19457f3a4ffa494be897fb2697612879",
+      "min_force_update": 0,
+      "size": 8234038
+    }
+  },
+  "schema": 1,
+  "soft_prompt_interval_hours": 24
+}

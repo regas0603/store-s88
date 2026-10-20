@@ -1,0 +1,26 @@
+{
+  "api_domain": "https://raw.githubusercontent.com/Vulcan-dev-25/configs/main/apps/api_test.json?",
+  "env": "pre",
+  "rs_domain": "https://rs.static607zgn.com/pre/",
+  "soft_prompt_interval_hours": 24,
+  "texts": {
+    "081db0ccfc8c": "Không mở được cửa hàng ứng dụng. Vui lòng thử lại.",
+    "081db1ccfc8c": "Cập nhật thành công",
+    "081db2ccfc8c": "Đã tải và cập nhật version mới (v{version}) thành công.\n\nOK: khởi động lại ứng dụng để chạy version mới ngay.\nCancel: tiếp tục phiên hiện tại — version mới sẽ tự áp dụng ở lần mở app sau.",
+    "081db3ccfc8c": "Đã tải và cập nhật version mới (v{version}) thành công.\n\nOK: tắt ứng dụng — mở lại để chạy version mới ngay.\nCancel: tiếp tục phiên hiện tại — version mới sẽ tự áp dụng ở lần mở app sau.",
+    "081db4ccfc8c": "Không khởi động lại được (code={code}).",
+    "081db5ccfc8c": "OK",
+    "081db6ccfc8c": "Cancel",
+    "081db7ccfc8c": "Ready",
+    "185be2d582a3": "Để sau",
+    "185be3d582a3": "Cập nhật",
+    "185bead582a3": "Lỗi Internet",
+    "185bebd582a3": "Loading...",
+    "185becd582a3": "Thử lại",
+    "185bedd582a3": "Không thể kết nối đến server. Thử lại?",
+    "185beed582a3": "Đã có bản cập nhật mới. Vui lòng cập nhật để tiếp tục sử dụng.",
+    "185befd582a3": "Cập nhật mới",
+    "185bf0d582a3": "Đã có bản cập nhật mới với nhiều cải tiến. Bạn có muốn cập nhật ngay?",
+    "185bf1d582a3": "Cập nhật ngay"
+  }
+}

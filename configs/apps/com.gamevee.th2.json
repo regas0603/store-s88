@@ -1,0 +1,26 @@
+{
+  "api_domain": "https://raw.githubusercontent.com/Vulcan-dev-25/configs/main/apps/api_test.json?",
+  "env": "prod",
+  "rs_domain": "https://rs.static607zgn.com/",
+  "soft_prompt_interval_hours": 24,
+  "texts": {
+    "59e14e5eb3d1": "Ready",
+    "59e14f5eb3d1": "Cancel",
+    "59e1505eb3d1": "OK",
+    "59e1515eb3d1": "Không khởi động lại được (code={code}).",
+    "59e1525eb3d1": "Đã tải và cập nhật version mới (v{version}) thành công.\n\nOK: tắt ứng dụng — mở lại để chạy version mới ngay.\nCancel: tiếp tục phiên hiện tại — version mới sẽ tự áp dụng ở lần mở app sau.",
+    "59e1535eb3d1": "Đã tải và cập nhật version mới (v{version}) thành công.\n\nOK: khởi động lại ứng dụng để chạy version mới ngay.\nCancel: tiếp tục phiên hiện tại — version mới sẽ tự áp dụng ở lần mở app sau.",
+    "59e1545eb3d1": "Cập nhật thành công",
+    "59e1555eb3d1": "Không mở được cửa hàng ứng dụng. Vui lòng thử lại.",
+    "e71d0af0eaa3": "Cập nhật mới",
+    "e71d0bf0eaa3": "Đã có bản cập nhật mới. Vui lòng cập nhật để tiếp tục sử dụng.",
+    "e71d0cf0eaa3": "Cập nhật ngay",
+    "e71d0df0eaa3": "Đã có bản cập nhật mới với nhiều cải tiến. Bạn có muốn cập nhật ngay?",
+    "e71d0ef0eaa3": "Loading...",
+    "e71d0ff0eaa3": "Lỗi Internet",
+    "e71d10f0eaa3": "Không thể kết nối đến server. Thử lại?",
+    "e71d11f0eaa3": "Thử lại",
+    "e71d16f0eaa3": "Cập nhật",
+    "e71d17f0eaa3": "Để sau"
+  }
+}

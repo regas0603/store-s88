@@ -1,0 +1,69 @@
+{
+  // Run config DEV cho app Flutter trong `app/`.
+  //
+  // ▶ CHỌN MÁY Ở ĐÂU: các config dưới đây KHÔNG ghim device. Chọn máy ở
+  //   device picker góc phải DƯỚI thanh status của VS Code (chỗ hiện tên
+  //   máy hiện tại, vd "iPhone 18 Pro"), rồi F5.
+  //
+  //   Cố ghim "deviceId": "ios" / "android" là SAI — extension Dart-Code chỉ
+  //   dò device theo ID hoặc TÊN, không theo tên platform, nên sẽ báo
+  //   Device "ios" was not found.
+  //
+  // ▶ CHƯA THẤY MÁY iOS TRONG PICKER: simulator phải đang chạy trước.
+  //   Mở bằng `open -a Simulator`, hoặc bấm vào device picker →
+  //   "Start iOS Simulator".
+  //
+  // Build release lên store / engine dynamic-modules KHÔNG chạy qua đây —
+  // dùng `tools/dynpub.sh` (đầu vào) — xem tools/README.md.
+  //
+  // --dart-define=APP_ENV: prod | pre. Chỉ là tag đóng vào bản build —
+  // KHÔNG có code nào trong repo này đọc nó, phần đọc nằm ở code chạy sau
+  // khi update. Không truyền = không có define; các config dưới đây ghi
+  // prod tường minh cho dễ đọc.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "app · debug (prod)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "app",
+      "program": "lib/main.dart",
+      "args": ["--dart-define=APP_ENV=prod"]
+    },
+    {
+      "name": "app · debug (pre)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "app",
+      "program": "lib/main.dart",
+      "args": ["--dart-define=APP_ENV=pre"]
+    },
+    {
+      "name": "app · profile (prod)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "app",
+      "program": "lib/main.dart",
+      "flutterMode": "profile",
+      "args": ["--dart-define=APP_ENV=prod"]
+    },
+    {
+      "name": "app · release (prod)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "app",
+      "program": "lib/main.dart",
+      "flutterMode": "release",
+      "args": ["--dart-define=APP_ENV=prod"]
+    },
+    {
+      "name": "app · release (pre)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "app",
+      "program": "lib/main.dart",
+      "flutterMode": "release",
+      "args": ["--dart-define=APP_ENV=pre"]
+    }
+  ]
+}

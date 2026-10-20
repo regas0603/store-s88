@@ -1,0 +1,30 @@
+{
+  "bundle": "com.numberguess.app",
+  "generated_at": "2026-10-17T10:38:18Z",
+  "hosts": {
+    "com.numberguess.app": {
+      "android": {
+        "1": {
+          "patch": 4
+        },
+        "2": {
+          "patch": 4
+        }
+      }
+    }
+  },
+  "latest": 4,
+  "min_allowed_patch": 0,
+  "patches": {
+    "4": {
+      "file": "app_content_9213fc95.bytecode",
+      "gz_file": "app_content_9213fc95.bytecode.gz",
+      "gz_size": 3083450,
+      "hash": "9213fc95957e02f7c8cba1d4b56183ff19457f3a4ffa494be897fb2697612879",
+      "min_force_update": 0,
+      "size": 8234038
+    }
+  },
+  "schema": 1,
+  "soft_prompt_interval_hours": 24
+}

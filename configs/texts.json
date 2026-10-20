@@ -1,0 +1,23 @@
+{
+  "_doc": "Nguồn text CHUNG cho mọi app (host: app/ + loading_kit). Sửa file này rồi chạy: python3 tools/cmd/gentexts.py — script sinh lib/core/text_keys.dart (hằng index) + ghi khối `texts` ĐÃ TOKEN-HOÁ vào mọi configs/apps/<bundleId>.json (token = fnv1a(bundleId:index) → mỗi app một token khác, binary không còn tên key). `{version}` / `{code}` là chỗ app tự thay. THỨ TỰ key = index: chỉ THÊM key ở cuối, KHÔNG chèn giữa / đổi chỗ (đổi index là đổi token của mọi key sau nó).",
+  "keys": {
+    "loading": "Loading...",
+    "connection_error_title": "Lỗi Internet",
+    "connection_error_message": "Không thể kết nối đến server. Thử lại?",
+    "connection_error_retry": "Thử lại",
+    "update_title": "Cập nhật mới",
+    "force_update_message": "Đã có bản cập nhật mới. Vui lòng cập nhật để tiếp tục sử dụng.",
+    "force_update_button": "Cập nhật ngay",
+    "soft_update_message": "Đã có bản cập nhật mới với nhiều cải tiến. Bạn có muốn cập nhật ngay?",
+    "soft_update_button": "Cập nhật",
+    "soft_update_later": "Để sau",
+    "store_open_error": "Không mở được cửa hàng ứng dụng. Vui lòng thử lại.",
+    "restart_title": "Cập nhật thành công",
+    "restart_message_android": "Đã tải và cập nhật version mới (v{version}) thành công.\n\nOK: khởi động lại ứng dụng để chạy version mới ngay.\nCancel: tiếp tục phiên hiện tại — version mới sẽ tự áp dụng ở lần mở app sau.",
+    "restart_message_ios": "Đã tải và cập nhật version mới (v{version}) thành công.\n\nOK: tắt ứng dụng — mở lại để chạy version mới ngay.\nCancel: tiếp tục phiên hiện tại — version mới sẽ tự áp dụng ở lần mở app sau.",
+    "restart_error": "Không khởi động lại được (code={code}).",
+    "restart_ok": "OK",
+    "restart_cancel": "Cancel",
+    "live_fallback": "Ready"
+  }
+}

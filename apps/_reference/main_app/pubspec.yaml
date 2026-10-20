@@ -1,0 +1,26 @@
+name: main_app_package
+description: >-
+  Main app UI — màn hình "sạch" + nhận diện app (title, tên app, theme) của
+  app shell. Thư mục này là NGUỒN trong repo; bản package app thực sự build
+  phụ thuộc được XUẤT ra ngoài bằng tools/cmd/build_main_app.sh
+  (mặc định ../main_app_package).
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  # CHỈ Flutter của engine (../engine/flutter-framework, CLAUDE.md §1): Flutter
+  # khác version bị pub từ chối ngay, không kịp ghi lại pubspec.lock.
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,48 @@
+# configs/abi/dynamic_interface.extra.yaml — entry interface KHÔNG sinh tự động được.
+#
+# gen_dynamic_interface.py khai MỌI library host ở mức library (callable /
+# extendable / can-be-overridden / can-be-used-as-type) — mức library không
+# phủ class PRIVATE. Ở đây chỉ ghi class private mà member PUBLIC của nó được
+# lộ qua class public (mixin/superclass private), validator báo:
+#   "Cannot invoke member '_X.y' from a dynamic module."
+#
+# Generator gộp file này vào dist/dynamic_interface.yaml mỗi lần gen.
+# Đây là một phần HỢP ĐỒNG host (đóng băng theo host release) — thêm dòng =
+# phải build lại host. docs/dynmod_build_once_plan.md P4.
+#
+# Định dạng: <section>: rồi các dòng "  - {library: ..., class: ...}".
+
+callable:
+  # dio: Options/RequestOptions lấy extra/headers/method/... từ class private.
+  - {library: 'package:dio/src/options.dart', class: '_RequestConfig'}
+  # dart:ui: RRect/RSuperellipse lấy width/left/top/deflate/shift/... từ _RRectLike.
+  - {library: 'dart:ui', class: '_RRectLike'}
+
+# Package host được lộ THÊM (mức library) ngoài: package module import trực
+# tiếp + tầng t1 (gen_dynamic_interface.py tự tính). Chỉ ghi package xuất hiện
+# trong API public của các package trên mà module chạm tới. Lộ cả 125 package
+# host làm libapp.so arm64 39MB → 88MB (P4) nên KHÔNG lộ tràn lan.
+expose-packages:
+  # web_socket_channel: sink kế thừa DelegatingStreamSink (package:async).
+  - async
+  # webview_flutter: WebViewController.platform trả PlatformWebViewController.
+  - webview_flutter_platform_interface
+  # Package tiện ích của host, lộ SẴN (2026-10-09): thư viện thuần Dart thêm
+  # vào module sau này hay import chúng — đã ở host thì module KHÔNG được mang
+  # bản riêng → chưa lộ = phải build lại host. Lộ trước để thêm package thuần
+  # Dart vào module chỉ cần dynpub patch.
+  - path
+  - collection
+  - typed_data
+  - characters
+  - http_parser
+  - rxdart
+  - xml
+  - synchronized
+  - string_scanner
+  - source_span
+  - mime
+  - petitparser
+  - vector_math
+  - json_annotation
+  - material_color_utilities

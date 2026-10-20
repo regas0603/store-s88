@@ -1,0 +1,16 @@
+# Thông tin build của app — dynpub.sh đọc khi build host cho bundle này.
+# KHÔNG commit file ký/mật khẩu: chỉ ghi đường dẫn (ngoài repo).
+bundle_id: com.gamevee.th2
+display_name: Cờ Caro
+# Icon vuông PNG >= 1024x1024 (tương đối thư mục này).
+icon: assets/icon.png
+android:
+  keystore: ""          # vd ~/keys/app.jks — trống = ký debug
+  key_alias: ""
+  # mật khẩu: env APP_KEYSTORE_PASSWORD / APP_KEY_PASSWORD, thiếu thì dynpub hỏi
+ios:
+  team_id: "NFWVFL2567"           # BẮT BUỘC khi build iOS — team Apple của bundle id này
+  profile: "dev2"           # profile DEVELOPMENT dùng lúc archive (project ký manual)
+  adhoc_profile: "adhoc2"     # profile Ad Hoc dùng lúc export (mode adhoc)
+  appstore_profile: ""  # profile App Store dùng lúc export (mode appstore)
+  export_options: ""    # tuỳ chọn: plist có sẵn cho adhoc (thay cho tự sinh)

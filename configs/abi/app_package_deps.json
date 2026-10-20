@@ -1,0 +1,145 @@
+{
+  "packages/adaptive_overlay/pubspec.yaml": {},
+  "packages/app_env/pubspec.yaml": {},
+  "packages/app_format/pubspec.yaml": {},
+  "packages/app_i18n/pubspec.yaml": {},
+  "packages/auth_domain/pubspec.yaml": {
+    "crypto": "^3.0.0",
+    "freezed_annotation": "^3.1.0"
+  },
+  "packages/betting_domain/pubspec.yaml": {},
+  "packages/brand_config/pubspec.yaml": {},
+  "packages/casino_jackpot/pubspec.yaml": {
+    "meta": "^1.11.0"
+  },
+  "packages/chat_protocol/pubspec.yaml": {
+    "clock": "^1.1.2"
+  },
+  "packages/dart_kit/pubspec.yaml": {},
+  "packages/floating_draggable_widget/pubspec.yaml": {},
+  "packages/flutter_slider_drawer/pubspec.yaml": {},
+  "packages/fullscreen_guard/pubspec.yaml": {
+    "meta": "^1.11.0",
+    "web": "^1.1.1"
+  },
+  "packages/game_api_client/pubspec.yaml": {
+    "dio": "^5.10.0",
+    "freezed_annotation": "^3.1.0",
+    "json_annotation": "^4.9.0",
+    "meta": "^1.11.0"
+  },
+  "packages/game_downloader/pubspec.yaml": {
+    "archive": ">=3.6.1 <5.0.0",
+    "dio": "^5.7.0",
+    "hive": "^2.2.3",
+    "hive_flutter": "^1.1.0",
+    "http": "^1.2.2",
+    "path_provider": "^2.1.4"
+  },
+  "packages/game_engine/pubspec.yaml": {
+    "flutter_inappwebview": "^6.1.5",
+    "meta": "^1.11.0",
+    "web": "^1.0.0"
+  },
+  "packages/game_foundation/pubspec.yaml": {
+    "clock": "^1.1.2"
+  },
+  "packages/game_launcher/pubspec.yaml": {
+    "package_info_plus": ">=8.0.0 <11.0.0"
+  },
+  "packages/game_orientation/pubspec.yaml": {},
+  "packages/game_taxonomy/pubspec.yaml": {},
+  "packages/game_volta_core/pubspec.yaml": {
+    "crypto": "^3.0.0",
+    "meta": "^1.15.0",
+    "state_notifier": "^1.0.0",
+    "web_socket_channel": "^3.0.0"
+  },
+  "packages/lode/pubspec.yaml": {
+    "collection": "^1.19.0",
+    "decimal": "^3.0.3",
+    "dio": "^5.4.0",
+    "equatable": "^2.0.7",
+    "freezed_annotation": "^3.1.0",
+    "json_annotation": "^4.9.0",
+    "meta": "^1.16.0",
+    "web_socket_channel": "^3.0.0"
+  },
+  "packages/mini_game_countdown_core/pubspec.yaml": {
+    "clock": "^1.1.2"
+  },
+  "packages/mini_game_protocol/pubspec.yaml": {
+    "freezed_annotation": "^3.1.0"
+  },
+  "packages/monitoring_domain/pubspec.yaml": {
+    "sentry": "^9.24.0"
+  },
+  "packages/notification_domain/pubspec.yaml": {},
+  "packages/orientation_guard/pubspec.yaml": {
+    "meta": "^1.11.0"
+  },
+  "packages/paygate_domain/pubspec.yaml": {},
+  "packages/provider_game_manager/pubspec.yaml": {},
+  "packages/sport_events/pubspec.yaml": {},
+  "packages/sport_notice/pubspec.yaml": {},
+  "packages/sport_socket/pubspec.yaml": {
+    "collection": "^1.18.0",
+    "fixnum": "^1.1.0",
+    "meta": "^1.11.0",
+    "protobuf": "^6.0.0",
+    "web": "^1.1.0",
+    "web_socket_channel": "^3.0.0"
+  },
+  "packages/transaction_domain/pubspec.yaml": {},
+  "pubspec.yaml": {
+    "archive": "^4.0.7",
+    "audioplayers": "^6.5.1",
+    "cached_network_image": "^3.4.1",
+    "clarity_flutter": "^1.9.0",
+    "clock": "^1.1.2",
+    "connectivity_plus": "^6.1.0",
+    "crypto": "^3.0.3",
+    "cupertino_icons": "^1.0.8",
+    "dartz": "^0.10.1",
+    "decimal": "^3.0.3",
+    "device_info_plus": "^11.5.0",
+    "dio": "^5.10.0",
+    "equatable": "^2.0.7",
+    "fixnum": "^1.1.0",
+    "flutter_riverpod": "^2.5.1",
+    "flutter_svg": "^2.2.2",
+    "freezed_annotation": "^3.1.0",
+    "gap": "^3.0.1",
+    "go_router": "^13.2.4",
+    "google_fonts": "^6.2.1",
+    "gradient_borders": "^1.0.2",
+    "hive": "^2.2.3",
+    "hive_flutter": "^1.1.0",
+    "http": "^1.1.0",
+    "intl": "^0.20.2",
+    "isolate_manager": "^6.1.2",
+    "json_annotation": "^4.9.0",
+    "logger": "2.6.2",
+    "lottie": "^3.3.2",
+    "package_info_plus": "^9.0.1",
+    "path_provider": "^2.1.0",
+    "pinput": "^6.0.1",
+    "pointer_interceptor": "^0.10.1",
+    "pretty_dio_logger": "^1.4.0",
+    "protobuf": "^6.0.0",
+    "qr_flutter": "^4.1.0",
+    "rive": "^0.14.9",
+    "sentry_flutter": "^9.24.0",
+    "shared_preferences": "^2.5.6",
+    "shimmer_animation": "^2.1.0",
+    "styled_text": "^8.1.0",
+    "url_launcher": "^6.2.5",
+    "uuid": "^4.2.1",
+    "video_player": "^2.9.2",
+    "wakelock_plus": "^1.4.0",
+    "web": "^1.1.1",
+    "web_socket_channel": "^3.0.0",
+    "webview_flutter": "^4.11.2",
+    "webview_flutter_wkwebview": "^3.23.7"
+  }
+}

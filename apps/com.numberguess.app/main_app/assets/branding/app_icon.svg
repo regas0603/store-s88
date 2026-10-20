@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Icon Number Guess: dấu hỏi lớn = con số đang bị giấu, hai mũi tên =
+       gợi ý cao hơn / thấp hơn. Chỉ ba hình khối, không hoạ tiết nền, nên vẫn
+       đọc được ở cỡ 40px trên thanh cài đặt. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#153624"/>
+      <stop offset="0.55" stop-color="#1F4632"/>
+      <stop offset="1" stop-color="#3C9460"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#A3E4B6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" rx="228" fill="url(#bg)"/>
+
+  <!-- mũi tên CAO HƠN -->
+  <g transform="translate(196 512)">
+    <path d="M0 -96 L64 -6 L24 -6 L24 96 L-24 96 L-24 -6 L-64 -6 Z"
+          fill="#FFD166"/>
+  </g>
+
+  <!-- mũi tên THẤP HƠN -->
+  <g transform="translate(828 512)">
+    <path d="M0 96 L64 6 L24 6 L24 -96 L-24 -96 L-24 6 L-64 6 Z"
+          fill="#6FD8F2"/>
+  </g>
+
+  <!-- dấu hỏi: baseline đặt thủ công để khối chữ nằm đúng tâm 512 -->
+  <text x="512" y="706" fill="url(#mark)"
+        font-family="Helvetica Neue, Helvetica, Arial, sans-serif"
+        font-size="580" font-weight="700" text-anchor="middle">?</text>
+</svg>

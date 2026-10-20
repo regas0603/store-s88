@@ -1,0 +1,414 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="2560" viewBox="0 0 2000 2560">
+<rect x="0" y="0" width="2000" height="2560" fill="#FFFFFF"/>
+<rect x="20" y="90" width="1960" height="190" rx="16" fill="#F8FAFC" stroke="#E2E8F0"/>
+<text x="40.0" y="123.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#1F2937" text-anchor="start">Menu wizard</text>
+<text x="40.0" y="144.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#6B7280" text-anchor="start">4 nhóm · lệnh nào ghi registry đều đi qua after_write (cột C)</text>
+<rect x="20" y="300" width="660" height="1830" rx="16" fill="#F8FAFC" stroke="#E2E8F0"/>
+<text x="40.0" y="333.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#1F2937" text-anchor="start">A · [5] Build host  /  release</text>
+<text x="40.0" y="354.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#6B7280" text-anchor="start">build apk/ipa với engine tự build → đăng ký ABI vào registry</text>
+<rect x="700" y="300" width="620" height="1830" rx="16" fill="#F8FAFC" stroke="#E2E8F0"/>
+<text x="720.0" y="333.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#1F2937" text-anchor="start">B · [1] Ra patch</text>
+<text x="720.0" y="354.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#6B7280" text-anchor="start">compile app_package → bytecode → registry/patches/vN</text>
+<rect x="1340" y="300" width="640" height="1830" rx="16" fill="#F8FAFC" stroke="#E2E8F0"/>
+<text x="1360.0" y="333.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#1F2937" text-anchor="start">C · after_write → deploy → commit</text>
+<text x="1360.0" y="354.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#6B7280" text-anchor="start">dùng chung cho [1] [4] [6] [7] [8] [9] [12]</text>
+<rect x="20" y="2150" width="1960" height="390" rx="16" fill="#F8FAFC" stroke="#E2E8F0"/>
+<text x="40.0" y="2183.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#1F2937" text-anchor="start">Vòng đời patch · lệnh sự cố · file chính</text>
+<polygon points="400.0,2332.0 405.0,2322.0 395.0,2322.0" fill="#64748B"/>
+<path d="M 400.0 2278.0 L 400.0 2332.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="140.0,2332.0 145.0,2322.0 135.0,2322.0" fill="#64748B"/>
+<path d="M 140.0 2278.0 L 140.0 2332.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="290.0,2250.0 280.0,2245.0 280.0,2255.0" fill="#64748B"/>
+<path d="M 240.0 2250.0 L 290.0 2250.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1470.0,1432.0 1475.0,1422.0 1465.0,1422.0" fill="#64748B"/>
+<path d="M 1680.0 1368.0 L 1680.0 1400.0 L 1470.0 1400.0 L 1470.0 1432.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1720.0,1552.0 1725.0,1542.0 1715.0,1542.0" fill="#64748B"/>
+<path d="M 1720.0 1488.0 L 1720.0 1552.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1720.0,1432.0 1725.0,1422.0 1715.0,1422.0" fill="#64748B"/>
+<path d="M 1720.0 1368.0 L 1720.0 1432.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1630.0,1340.0 1620.0,1335.0 1620.0,1345.0" fill="#64748B"/>
+<path d="M 1560.0 1340.0 L 1630.0 1340.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1765.0,1135.0 1775.0,1140.0 1775.0,1130.0" fill="#64748B"/>
+<path d="M 1790.0 1135.0 L 1765.0 1135.0" fill="none" stroke="#64748B" stroke-width="1.6" stroke-dasharray="6 5"/>
+<polygon points="1960.0,1135.0 1970.0,1140.0 1970.0,1130.0" fill="#64748B"/>
+<path d="M 1960.0 625.0 L 1965.0 625.0 L 1965.0 1135.0 L 1960.0 1135.0" fill="none" stroke="#64748B" stroke-width="1.6" stroke-dasharray="6 5"/>
+<polygon points="1875.0,1097.0 1880.0,1087.0 1870.0,1087.0" fill="#64748B"/>
+<path d="M 1875.0 923.0 L 1875.0 1097.0" fill="none" stroke="#64748B" stroke-width="1.6" stroke-dasharray="6 5"/>
+<polygon points="1580.0,1097.0 1585.0,1087.0 1575.0,1087.0" fill="#64748B"/>
+<path d="M 1580.0 1045.0 L 1580.0 1097.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1580.0,975.0 1585.0,965.0 1575.0,965.0" fill="#64748B"/>
+<path d="M 1580.0 927.0 L 1580.0 975.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1790.0,895.0 1780.0,890.0 1780.0,900.0" fill="#64748B"/>
+<path d="M 1730.0 895.0 L 1790.0 895.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1580.0,863.0 1585.0,853.0 1575.0,853.0" fill="#64748B"/>
+<path d="M 1580.0 815.0 L 1580.0 863.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1580.0,705.0 1585.0,695.0 1575.0,695.0" fill="#64748B"/>
+<path d="M 1580.0 657.0 L 1580.0 705.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1790.0,625.0 1780.0,620.0 1780.0,630.0" fill="#64748B"/>
+<path d="M 1730.0 625.0 L 1790.0 625.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1580.0,593.0 1585.0,583.0 1575.0,583.0" fill="#64748B"/>
+<path d="M 1580.0 543.0 L 1580.0 593.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1395.0,1135.0 1385.0,1130.0 1385.0,1140.0" fill="#64748B"/>
+<path d="M 1395.0 505.0 L 1395.0 505.0 L 1395.0 1135.0 L 1395.0 1135.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1580.0,467.0 1585.0,457.0 1575.0,457.0" fill="#64748B"/>
+<path d="M 1580.0 423.0 L 1580.0 467.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1430.0,395.0 1420.0,390.0 1420.0,400.0" fill="#64748B"/>
+<path d="M 1100.0 1620.0 L 1360.0 1620.0 L 1360.0 395.0 L 1430.0 395.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="915.0,1592.0 920.0,1582.0 910.0,1582.0" fill="#64748B"/>
+<path d="M 915.0 1542.0 L 915.0 1592.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="915.0,1458.0 920.0,1448.0 910.0,1448.0" fill="#64748B"/>
+<path d="M 915.0 1407.0 L 915.0 1458.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1140.0,1365.0 1130.0,1360.0 1130.0,1370.0" fill="#64748B"/>
+<path d="M 1100.0 1365.0 L 1140.0 1365.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="915.0,1323.0 920.0,1313.0 910.0,1313.0" fill="#64748B"/>
+<path d="M 915.0 1272.0 L 915.0 1323.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="915.0,1188.0 920.0,1178.0 910.0,1178.0" fill="#64748B"/>
+<path d="M 915.0 1143.0 L 915.0 1188.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1055.0,1323.0 1060.0,1313.0 1050.0,1313.0" fill="#64748B"/>
+<path d="M 1215.0 1135.0 L 1215.0 1305.0 L 1055.0 1305.0 L 1055.0 1323.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1135.0,1105.0 1125.0,1100.0 1125.0,1110.0" fill="#64748B"/>
+<path d="M 1100.0 1105.0 L 1135.0 1105.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="915.0,1067.0 920.0,1057.0 910.0,1057.0" fill="#64748B"/>
+<path d="M 915.0 1023.0 L 915.0 1067.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="915.0,967.0 920.0,957.0 910.0,957.0" fill="#64748B"/>
+<path d="M 915.0 928.0 L 915.0 967.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="915.0,872.0 920.0,862.0 910.0,862.0" fill="#64748B"/>
+<path d="M 915.0 823.0 L 915.0 872.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1140.0,785.0 1130.0,780.0 1130.0,790.0" fill="#64748B"/>
+<path d="M 1100.0 785.0 L 1140.0 785.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="915.0,747.0 920.0,737.0 910.0,737.0" fill="#64748B"/>
+<path d="M 915.0 698.0 L 915.0 747.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="915.0,632.0 920.0,622.0 910.0,622.0" fill="#64748B"/>
+<path d="M 915.0 585.0 L 915.0 632.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1140.0,550.0 1130.0,545.0 1130.0,555.0" fill="#64748B"/>
+<path d="M 1100.0 550.0 L 1140.0 550.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="915.0,515.0 920.0,505.0 910.0,505.0" fill="#64748B"/>
+<path d="M 915.0 470.0 L 915.0 515.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="1140.0,420.0 1130.0,415.0 1130.0,425.0" fill="#64748B"/>
+<path d="M 1100.0 420.0 L 1140.0 420.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,2022.0 250.0,2012.0 240.0,2012.0" fill="#64748B"/>
+<path d="M 245.0 1975.0 L 245.0 2022.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,1915.0 250.0,1905.0 240.0,1905.0" fill="#64748B"/>
+<path d="M 245.0 1862.0 L 245.0 1915.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,1778.0 250.0,1768.0 240.0,1768.0" fill="#64748B"/>
+<path d="M 245.0 1735.0 L 245.0 1778.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="448.0,1700.0 438.0,1695.0 438.0,1705.0" fill="#64748B"/>
+<path d="M 415.0 1700.0 L 448.0 1700.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,1665.0 250.0,1655.0 240.0,1655.0" fill="#64748B"/>
+<path d="M 245.0 1625.0 L 245.0 1665.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,1565.0 250.0,1555.0 240.0,1555.0" fill="#64748B"/>
+<path d="M 245.0 1523.0 L 245.0 1565.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,1457.0 250.0,1447.0 240.0,1447.0" fill="#64748B"/>
+<path d="M 245.0 1417.0 L 245.0 1457.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,1333.0 250.0,1323.0 240.0,1323.0" fill="#64748B"/>
+<path d="M 245.0 1293.0 L 245.0 1333.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,1227.0 250.0,1217.0 240.0,1217.0" fill="#64748B"/>
+<path d="M 245.0 1188.0 L 245.0 1227.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="478.0,1150.0 468.0,1145.0 468.0,1155.0" fill="#64748B"/>
+<path d="M 425.0 1150.0 L 478.0 1150.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,1112.0 250.0,1102.0 240.0,1102.0" fill="#64748B"/>
+<path d="M 245.0 1075.0 L 245.0 1112.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,1015.0 250.0,1005.0 240.0,1005.0" fill="#64748B"/>
+<path d="M 245.0 973.0 L 245.0 1015.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="478.0,935.0 468.0,930.0 468.0,940.0" fill="#64748B"/>
+<path d="M 425.0 935.0 L 478.0 935.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,897.0 250.0,887.0 240.0,887.0" fill="#64748B"/>
+<path d="M 245.0 860.0 L 245.0 897.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="478.0,815.0 468.0,810.0 468.0,820.0" fill="#64748B"/>
+<path d="M 425.0 815.0 L 478.0 815.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,770.0 250.0,760.0 240.0,760.0" fill="#64748B"/>
+<path d="M 245.0 733.0 L 245.0 770.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,667.0 250.0,657.0 240.0,657.0" fill="#64748B"/>
+<path d="M 245.0 633.0 L 245.0 667.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,567.0 250.0,557.0 240.0,557.0" fill="#64748B"/>
+<path d="M 245.0 525.0 L 245.0 567.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="425.0,600.0 435.0,605.0 435.0,595.0" fill="#64748B"/>
+<path d="M 548.0 532.0 L 548.0 600.0 L 425.0 600.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="448.0,490.0 438.0,485.0 438.0,495.0" fill="#64748B"/>
+<path d="M 415.0 490.0 L 448.0 490.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<polygon points="245.0,455.0 250.0,445.0 240.0,445.0" fill="#64748B"/>
+<path d="M 245.0 418.0 L 245.0 455.0" fill="none" stroke="#64748B" stroke-width="1.6"/>
+<text x="30.0" y="50.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#1F2937" text-anchor="start">dynpub — build host · ra patch · phát hành</text>
+<text x="30.0" y="74.5" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7280" text-anchor="start">bash tools/dynpub.sh  (wizard)  ·  CLI: patch [--envs] [--min-force-update N]  ·  release --app &lt;b&gt; --platform ios|android  ·  reg &lt;cmd&gt;  ·  DYNPUB_YES=1 = trả lời Y mọi câu</text>
+<rect x="40.0" y="130.0" width="460" height="130" rx="10" fill="#EAF2FF" stroke="#2563EB" stroke-width="1.5"/>
+<text x="270.0" y="199.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="middle"></text>
+<text x="58.0" y="152.9" font-family="Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1F2937" text-anchor="start">Hằng ngày</text>
+<text x="58.0" y="180.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start">[1] Ra patch  → cột B</text>
+<text x="58.0" y="202.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start">[2] Deploy lên rs_domain</text>
+<text x="58.0" y="224.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start">[3] Xem kế hoạch (plan)</text>
+<text x="58.0" y="246.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start">[4] Promote patch sang env khác</text>
+<rect x="525.0" y="130.0" width="460" height="130" rx="10" fill="#E7F7EE" stroke="#16A34A" stroke-width="1.5"/>
+<text x="755.0" y="199.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="middle"></text>
+<text x="543.0" y="152.9" font-family="Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1F2937" text-anchor="start">Phát hành bản app</text>
+<text x="543.0" y="180.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start">[5] Build host  → cột A</text>
+<text x="543.0" y="202.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start">[6] Trạng thái store  → vòng đời</text>
+<text x="543.0" y="224.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start"></text>
+<text x="543.0" y="246.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start"></text>
+<rect x="1010.0" y="130.0" width="460" height="130" rx="10" fill="#FDECEC" stroke="#DC2626" stroke-width="1.5"/>
+<text x="1240.0" y="199.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="middle"></text>
+<text x="1028.0" y="152.9" font-family="Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1F2937" text-anchor="start">Sự cố / ép</text>
+<text x="1028.0" y="180.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start">[7] Rút patch (retract)</text>
+<text x="1028.0" y="202.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start">[8] Ép: force-vc · block-below</text>
+<text x="1028.0" y="224.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start">     · min_force_update</text>
+<text x="1028.0" y="246.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start">     · app thay thế chung (prod)</text>
+<rect x="1495.0" y="130.0" width="460" height="130" rx="10" fill="#F1F5F9" stroke="#64748B" stroke-width="1.5"/>
+<text x="1725.0" y="199.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="middle"></text>
+<text x="1513.0" y="152.9" font-family="Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1F2937" text-anchor="start">Ít dùng</text>
+<text x="1513.0" y="180.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start">[9] Quản lý app (thêm/chết/sống/env)</text>
+<text x="1513.0" y="202.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start">[10] check-links store</text>
+<text x="1513.0" y="224.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start">[11] Đổi package host (ABI mới)</text>
+<text x="1513.0" y="246.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#1F2937" text-anchor="start">[12] Đổi rs_domain</text>
+<rect x="65.0" y="362.0" width="360" height="56" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.5"/>
+<text x="245.0" y="386.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">pick_bundle</text>
+<text x="245.0" y="402.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">registry + apps/* (bỏ thư mục _*)</text>
+<polygon points="75.0,490.0 97.0,455.0 393.0,455.0 415.0,490.0 393.0,525.0 97.0,525.0" fill="#FFF7E6" stroke="#D97706" stroke-width="1.5"/>
+<text x="245.0" y="486.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">App đã đăng ký</text>
+<text x="245.0" y="502.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">và có apps/&lt;b&gt;/app.yaml?</text>
+<rect x="448.0" y="448.0" width="200" height="84" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="548.0" y="469.9" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">reg bundle-add</text>
+<text x="548.0" y="486.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">scaffold apps/&lt;b&gt;/</text>
+<text x="548.0" y="502.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">configs/apps/&lt;b&gt;.json</text>
+<text x="548.0" y="518.5" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">+ gentexts</text>
+<rect x="65.0" y="567.0" width="360" height="66" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="245.0" y="588.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Chọn platform + mode</text>
+<text x="245.0" y="604.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">android: ddm | debug</text>
+<text x="245.0" y="620.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">ios: adhoc | appstore | debug | profile</text>
+<rect x="65.0" y="667.0" width="360" height="66" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="245.0" y="688.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">reg reserve-version</text>
+<text x="245.0" y="704.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">vc = max + 1  →  1.0.N+N</text>
+<text x="245.0" y="720.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">ghi ngay last_version_code (build lỗi vẫn mất số)</text>
+<polygon points="65.0,815.0 87.0,770.0 403.0,770.0 425.0,815.0 403.0,860.0 87.0,860.0" fill="#FFF7E6" stroke="#D97706" stroke-width="1.5"/>
+<text x="245.0" y="803.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">apply_identity: check</text>
+<text x="245.0" y="819.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">app_identity · gentexts --check</text>
+<text x="245.0" y="835.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">check_flutter (HEAD = tag configs/flutter.json)</text>
+<rect x="478.0" y="793.0" width="140" height="44" rx="22.0" fill="#FDECEC" stroke="#DC2626" stroke-width="1.5"/>
+<text x="548.0" y="819.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">LỖI → dừng</text>
+<polygon points="65.0,935.0 87.0,897.0 403.0,897.0 425.0,935.0 403.0,973.0 87.0,973.0" fill="#FFF7E6" stroke="#D97706" stroke-width="1.5"/>
+<text x="245.0" y="923.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">lock_reset</text>
+<text x="245.0" y="939.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">lockcheck.py: lock vs HEAD</text>
+<text x="245.0" y="955.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">không lệch version host?</text>
+<rect x="478.0" y="913.0" width="140" height="44" rx="22.0" fill="#FDECEC" stroke="#DC2626" stroke-width="1.5"/>
+<text x="548.0" y="939.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">LỖI → dừng</text>
+<rect x="65.0" y="1015.0" width="360" height="60" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="245.0" y="1041.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">build_main_app.sh → ../main_app_package</text>
+<text x="245.0" y="1057.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">dynmod.sh pubget</text>
+<polygon points="65.0,1150.0 87.0,1112.0 403.0,1112.0 425.0,1150.0 403.0,1188.0 87.0,1188.0" fill="#FFF7E6" stroke="#D97706" stroke-width="1.5"/>
+<text x="245.0" y="1146.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">lock_verify</text>
+<text x="245.0" y="1162.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">chỉ THÊM package, không đổi version?</text>
+<rect x="478.0" y="1128.0" width="140" height="44" rx="22.0" fill="#FDECEC" stroke="#DC2626" stroke-width="1.5"/>
+<text x="548.0" y="1154.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">LỖI → dừng</text>
+<rect x="65.0" y="1227.0" width="360" height="66" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="245.0" y="1248.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Identity</text>
+<text x="245.0" y="1264.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">Android: keystore pw · iOS: ios-check + xcconfig</text>
+<text x="245.0" y="1280.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">icons-apply (backup)</text>
+<rect x="65.0" y="1333.0" width="360" height="84" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="245.0" y="1354.9" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">freeze_iface</text>
+<text x="245.0" y="1371.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">dyniface bootstrap → dynamic_interface.yaml</text>
+<text x="245.0" y="1387.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">abicheck host lệch → snapshot module_abi.json</text>
+<text x="245.0" y="1403.5" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">(KHÔNG chặn) · gen_host_iface</text>
+<rect x="65.0" y="1457.0" width="360" height="66" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="245.0" y="1478.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">flutter build apk | ipa</text>
+<text x="245.0" y="1494.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">--local-engine android_release_arm64 | ios_release</text>
+<text x="245.0" y="1510.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">--dynamic-interface=&lt;host iface&gt;</text>
+<rect x="65.0" y="1565.0" width="360" height="60" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="245.0" y="1591.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">cleanup_identity (icon, xcconfig, lock)</text>
+<text x="245.0" y="1607.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">→ dist/builds/&lt;b&gt;_&lt;p&gt;_&lt;name&gt;+&lt;vc&gt;.apk|ipa</text>
+<polygon points="75.0,1700.0 97.0,1665.0 393.0,1665.0 415.0,1700.0 393.0,1735.0 97.0,1735.0" fill="#FFF7E6" stroke="#D97706" stroke-width="1.5"/>
+<text x="245.0" y="1696.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Mode đăng ký?</text>
+<text x="245.0" y="1712.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">ddm · adhoc · appstore</text>
+<rect x="448.0" y="1670.0" width="200" height="60" rx="10" fill="#F1F5F9" stroke="#64748B" stroke-width="1.5"/>
+<text x="548.0" y="1696.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">engine stock</text>
+<text x="548.0" y="1712.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">không đăng ký registry</text>
+<rect x="65.0" y="1778.0" width="360" height="84" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="245.0" y="1799.9" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">reg register-host</text>
+<text x="245.0" y="1816.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">compute_provides → abi_id → registry/abis</text>
+<text x="245.0" y="1832.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">thêm build vào registry/hosts/&lt;b&gt;.json</text>
+<text x="245.0" y="1848.5" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">+ compat.json (cùng vc khác ABI → lỗi)</text>
+<rect x="65.0" y="1915.0" width="360" height="60" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+<text x="245.0" y="1941.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">git commit (chỉ registry)</text>
+<text x="245.0" y="1957.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">"dynpub: build &lt;b&gt; &lt;p&gt; &lt;name&gt;+&lt;vc&gt;"</text>
+<rect x="65.0" y="2022.0" width="360" height="66" rx="10" fill="#E7F7EE" stroke="#16A34A" stroke-width="1.5"/>
+<text x="245.0" y="2043.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Trạng thái = built</text>
+<text x="245.0" y="2059.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">chưa vào manifest (fail-open) · KHÔNG deploy</text>
+<text x="245.0" y="2075.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">→ [6] trên máy có VPN</text>
+<text x="431.5" y="486.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="middle">Không</text>
+<text x="253.0" y="550.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">Có</text>
+<text x="451.5" y="811.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="middle">Lỗi</text>
+<text x="253.0" y="882.7" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">OK</text>
+<text x="451.5" y="931.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="middle">Lệch</text>
+<text x="253.0" y="998.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">OK → checkout lock</text>
+<text x="451.5" y="1146.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="middle">Lệch</text>
+<text x="253.0" y="1211.7" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">OK</text>
+<text x="431.5" y="1696.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="middle">Không</text>
+<text x="253.0" y="1760.7" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">Có</text>
+<polygon points="730.0,420.0 752.0,370.0 1078.0,370.0 1100.0,420.0 1078.0,470.0 752.0,470.0" fill="#FFF7E6" stroke="#D97706" stroke-width="1.5"/>
+<text x="915.0" y="399.9" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">modprep.sh apply</text>
+<text x="915.0" y="416.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">templates/module → ../app_package</text>
+<text x="915.0" y="432.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">kiểm API · vm_web_scan · classify_packages</text>
+<text x="915.0" y="448.5" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">abicheck app-package (khớp ABI đã chốt)</text>
+<rect x="1140.0" y="390.0" width="150" height="60" rx="10" fill="#FDECEC" stroke="#DC2626" stroke-width="1.5"/>
+<text x="1215.0" y="416.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">LỖI → dừng</text>
+<text x="1215.0" y="432.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">đổi pkg → [11]</text>
+<polygon points="730.0,550.0 752.0,515.0 1078.0,515.0 1100.0,550.0 1078.0,585.0 752.0,585.0" fill="#FFF7E6" stroke="#D97706" stroke-width="1.5"/>
+<text x="915.0" y="546.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">check_flutter + lock_reset</text>
+<text x="915.0" y="562.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">(như cột A)</text>
+<rect x="1140.0" y="528.0" width="150" height="44" rx="22.0" fill="#FDECEC" stroke="#DC2626" stroke-width="1.5"/>
+<text x="1215.0" y="554.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">LỖI → dừng</text>
+<rect x="730.0" y="632.0" width="370" height="66" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="915.0" y="653.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">build_main_app.sh</text>
+<text x="915.0" y="669.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">(apps/_reference/main_app)</text>
+<text x="915.0" y="685.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">pubget + lock_verify</text>
+<polygon points="730.0,785.0 752.0,747.0 1078.0,747.0 1100.0,785.0 1078.0,823.0 752.0,823.0" fill="#FFF7E6" stroke="#D97706" stroke-width="1.5"/>
+<text x="915.0" y="781.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">dyniface bootstrap + compile</text>
+<text x="915.0" y="797.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">dart2bytecode --validate OK?</text>
+<rect x="1140.0" y="763.0" width="150" height="44" rx="22.0" fill="#FDECEC" stroke="#DC2626" stroke-width="1.5"/>
+<text x="1215.0" y="789.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">LỖI → dừng</text>
+<rect x="730.0" y="872.0" width="370" height="56" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="915.0" y="904.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Lấy dist/app_content_&lt;h8&gt;.bytecode mới nhất</text>
+<rect x="730.0" y="967.0" width="370" height="56" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="915.0" y="991.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Chọn envs (mặc định staging)</text>
+<text x="915.0" y="1007.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">+ min_force_update (mặc định 0)</text>
+<polygon points="730.0,1105.0 752.0,1067.0 1078.0,1067.0 1100.0,1105.0 1078.0,1143.0 752.0,1143.0" fill="#FFF7E6" stroke="#D97706" stroke-width="1.5"/>
+<text x="915.0" y="1093.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">reg register-patch</text>
+<text x="915.0" y="1109.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">trùng hash + requires</text>
+<text x="915.0" y="1125.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">với patch đã có?</text>
+<rect x="1135.0" y="1075.0" width="160" height="60" rx="10" fill="#EAF2FF" stroke="#2563EB" stroke-width="1.5"/>
+<text x="1215.0" y="1101.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">chỉ gộp envs</text>
+<text x="1215.0" y="1117.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">vào vN cũ</text>
+<rect x="730.0" y="1188.0" width="370" height="84" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="915.0" y="1209.9" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Tạo registry/patches/vN.json</text>
+<text x="915.0" y="1226.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">copy publish/patches/ + .gz · archive</text>
+<text x="915.0" y="1242.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">compute_requires (pkg host + iface)</text>
+<text x="915.0" y="1258.5" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">report ✓/✗ theo từng ABI</text>
+<polygon points="730.0,1365.0 752.0,1323.0 1078.0,1323.0 1100.0,1365.0 1078.0,1407.0 752.0,1407.0" fill="#FFF7E6" stroke="#D97706" stroke-width="1.5"/>
+<text x="915.0" y="1353.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">commit() — validator</text>
+<text x="915.0" y="1369.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">force không có URL · min_allowed &gt; latest</text>
+<text x="915.0" y="1385.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">thiếu file/hash · env không có trong deploy.json</text>
+<rect x="1140.0" y="1335.0" width="150" height="60" rx="10" fill="#FDECEC" stroke="#DC2626" stroke-width="1.5"/>
+<text x="1215.0" y="1361.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Có lỗi →</text>
+<text x="1215.0" y="1377.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">KHÔNG ghi gì</text>
+<rect x="730.0" y="1458.0" width="370" height="84" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="915.0" y="1479.9" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Ghi: registry + compat.json</text>
+<text x="915.0" y="1496.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">publish/&lt;env&gt;/manifest/&lt;b&gt;.json</text>
+<text x="915.0" y="1512.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">prune publish/patches</text>
+<text x="915.0" y="1528.5" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">đánh dấu env vào dist/.dynpub_changed_envs</text>
+<rect x="730.0" y="1592.0" width="370" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+<text x="915.0" y="1624.5" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#1F2937" text-anchor="middle">after_write "patch"  → cột C</text>
+<rect x="730.0" y="1705.0" width="560" height="110" rx="10" fill="#FAFAF9" stroke="#D6D3D1" stroke-width="1.5"/>
+<text x="1010.0" y="1731.8" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Ghi chú B</text>
+<text x="1010.0" y="1748.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">• CLI `dynpub.sh patch`: dừng sau bước ghi — KHÔNG deploy, KHÔNG commit.</text>
+<text x="1010.0" y="1764.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">• Mỗi ABI nhận max_patch = patch cao nhất (chưa retract) tương thích:</text>
+<text x="1010.0" y="1780.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">   cùng engine_rev · cùng contract_version · cùng version package</text>
+<text x="1010.0" y="1796.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">   · requires.iface ⊆ provides.iface.</text>
+<text x="1120.0" y="416.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="middle">Lỗi</text>
+<text x="923.0" y="496.7" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">OK</text>
+<text x="1120.0" y="546.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="middle">Lỗi</text>
+<text x="923.0" y="612.7" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">OK</text>
+<text x="1120.0" y="781.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="middle">Lỗi</text>
+<text x="923.0" y="851.7" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">OK</text>
+<text x="1117.5" y="1101.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="middle">Có</text>
+<text x="923.0" y="1169.7" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">Không</text>
+<text x="1120.0" y="1361.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="middle">Lỗi</text>
+<text x="923.0" y="1436.7" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">OK</text>
+<rect x="1420.0" y="367.0" width="320" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+<text x="1580.0" y="399.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#1F2937" text-anchor="middle">after_write "&lt;msg&gt;"</text>
+<polygon points="1395.0,505.0 1417.0,467.0 1743.0,467.0 1765.0,505.0 1743.0,543.0 1417.0,543.0" fill="#FFF7E6" stroke="#D97706" stroke-width="1.5"/>
+<text x="1580.0" y="493.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Có env đã đổi?</text>
+<text x="1580.0" y="509.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">reg changed-envs</text>
+<text x="1580.0" y="525.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">(dist/.dynpub_changed_envs)</text>
+<polygon points="1430.0,625.0 1452.0,593.0 1708.0,593.0 1730.0,625.0 1708.0,657.0 1452.0,657.0" fill="#FFF7E6" stroke="#D97706" stroke-width="1.5"/>
+<text x="1580.0" y="629.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Deploy env … ngay?  [Y/n]</text>
+<rect x="1790.0" y="590.0" width="170" height="70" rx="10" fill="#F1F5F9" stroke="#64748B" stroke-width="1.5"/>
+<text x="1875.0" y="613.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">defer_commit</text>
+<text x="1875.0" y="629.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">ghi msg vào</text>
+<text x="1875.0" y="645.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">.dynpub_pending_commit</text>
+<rect x="1395.0" y="705.0" width="370" height="110" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="1580.0" y="731.8" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">reg deploy --env (từng env)</text>
+<text x="1580.0" y="748.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">kiểm bytecode đủ + rs_domain khớp</text>
+<text x="1580.0" y="764.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">SFTP: bytecode trước (bỏ file cùng size)</text>
+<text x="1580.0" y="780.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">→ manifest/&lt;b&gt;.json vào &lt;ssh.path&gt;/app/</text>
+<text x="1580.0" y="796.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">→ đọc lại sha256 qua SFTP</text>
+<polygon points="1430.0,895.0 1452.0,863.0 1708.0,863.0 1730.0,895.0 1708.0,927.0 1452.0,927.0" fill="#FFF7E6" stroke="#D97706" stroke-width="1.5"/>
+<text x="1580.0" y="899.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Deploy OK hết?</text>
+<rect x="1790.0" y="867.0" width="170" height="56" rx="10" fill="#F1F5F9" stroke="#64748B" stroke-width="1.5"/>
+<text x="1875.0" y="891.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">defer_commit</text>
+<text x="1875.0" y="907.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">(không copy configs)</text>
+<rect x="1395.0" y="975.0" width="370" height="70" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<text x="1580.0" y="998.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">copy_configs → ../configs/apps/&lt;b&gt;.json</text>
+<text x="1580.0" y="1014.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">bỏ đánh dấu env</text>
+<text x="1580.0" y="1030.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">(repo configs: tự commit + push)</text>
+<rect x="1395.0" y="1097.0" width="370" height="76" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+<text x="1580.0" y="1123.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">do_commit</text>
+<text x="1580.0" y="1139.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">git add registry publish configs/apps</text>
+<text x="1580.0" y="1155.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">configs/deploy.json apps → "dynpub: &lt;msg&gt;"</text>
+<rect x="1790.0" y="1097.0" width="170" height="76" rx="10" fill="#EAF2FF" stroke="#2563EB" stroke-width="1.5"/>
+<text x="1875.0" y="1123.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">[2] Deploy</text>
+<text x="1875.0" y="1139.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">OK → commit các</text>
+<text x="1875.0" y="1155.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">msg đang chờ</text>
+<text x="1350.0" y="494.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">Không</text>
+<text x="1588.0" y="572.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">Có</text>
+<text x="1760.0" y="621.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="middle">Không</text>
+<text x="1588.0" y="685.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">Có</text>
+<text x="1760.0" y="891.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="middle">Không</text>
+<text x="1588.0" y="955.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">Có</text>
+<text x="1360.0" y="1255.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1F2937" text-anchor="start">Vòng đời build — [6] Trạng thái store</text>
+<text x="1360.0" y="1276.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#6B7280" text-anchor="start">reg store &lt;b&gt; &lt;p&gt; &lt;vc&gt; &lt;state&gt; → registry/store/&lt;b&gt;.json (nguồn DUY NHẤT của manifest)</text>
+<rect x="1380.0" y="1312.0" width="180" height="56" rx="10" fill="#F1F5F9" stroke="#64748B" stroke-width="1.5"/>
+<text x="1470.0" y="1336.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#1F2937" text-anchor="middle">built</text>
+<text x="1470.0" y="1351.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#1F2937" text-anchor="middle">chỉ ở hosts/ · ngoài manifest</text>
+<rect x="1630.0" y="1312.0" width="180" height="56" rx="10" fill="#EAF2FF" stroke="#2563EB" stroke-width="1.5"/>
+<text x="1720.0" y="1336.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">submitted</text>
+<text x="1720.0" y="1352.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">vào manifest</text>
+<rect x="1630.0" y="1432.0" width="180" height="56" rx="10" fill="#E7F7EE" stroke="#16A34A" stroke-width="1.5"/>
+<text x="1720.0" y="1456.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#1F2937" text-anchor="middle">live</text>
+<text x="1720.0" y="1471.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#1F2937" text-anchor="middle">làm URL store cho soft/force</text>
+<rect x="1630.0" y="1552.0" width="180" height="56" rx="10" fill="#F1F5F9" stroke="#64748B" stroke-width="1.5"/>
+<text x="1720.0" y="1576.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#1F2937" text-anchor="middle">removed</text>
+<text x="1720.0" y="1591.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#1F2937" text-anchor="middle">vẫn giữ trong manifest</text>
+<rect x="1380.0" y="1432.0" width="180" height="56" rx="10" fill="#FDECEC" stroke="#DC2626" stroke-width="1.5"/>
+<text x="1470.0" y="1456.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#1F2937" text-anchor="middle">rejected</text>
+<text x="1470.0" y="1471.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#1F2937" text-anchor="middle">mảng rejected, ra khỏi manifest</text>
+<text x="1480.0" y="1396.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="start">chỉ từ submitted</text>
+<rect x="1360.0" y="1645.0" width="600" height="110" rx="10" fill="#FAFAF9" stroke="#D6D3D1" stroke-width="1.5"/>
+<text x="1660.0" y="1671.8" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Ghi chú vòng đời</text>
+<text x="1660.0" y="1688.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">• rejected → nộp lại → submitted.  Bất kỳ → built: xoá khỏi store/.</text>
+<text x="1660.0" y="1704.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">• submitted/live → remind_patch (nhắc patch tương thích).</text>
+<text x="1660.0" y="1720.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">• Mỗi lần đổi: validator → sinh lại manifest → after_write</text>
+<text x="1660.0" y="1736.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">   → "dynpub: store &lt;b&gt; &lt;p&gt; vc&lt;N&gt; &lt;state&gt;"</text>
+<rect x="1360.0" y="1805.0" width="600" height="150" rx="10" fill="#FAFAF9" stroke="#D6D3D1" stroke-width="1.5"/>
+<text x="1660.0" y="1851.8" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">Action trong manifest (compute_actions)</text>
+<text x="1660.0" y="1868.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">• force: patch đích &lt; min_allowed_patch  HOẶC  vc &lt; force_vc.below</text>
+<text x="1660.0" y="1884.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">   URL = store của app nếu có build live đạt ngưỡng, không thì app thay thế (prod)</text>
+<text x="1660.0" y="1900.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">• soft: patch đích &lt; latest  (URL store nếu build live đi xa hơn)</text>
+<text x="1660.0" y="1916.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">• none: còn lại</text>
+<rect x="40.0" y="2222.0" width="200" height="56" rx="10" fill="#E7F7EE" stroke="#16A34A" stroke-width="1.5"/>
+<text x="140.0" y="2246.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">[1] vN active</text>
+<text x="140.0" y="2262.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">envs = staging</text>
+<rect x="290.0" y="2222.0" width="220" height="56" rx="10" fill="#EAF2FF" stroke="#2563EB" stroke-width="1.5"/>
+<text x="400.0" y="2246.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="middle">[4] promote</text>
+<text x="400.0" y="2262.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="middle">staging → pre → prod</text>
+<rect x="40.0" y="2332.0" width="200" height="56" rx="10" fill="#EAF2FF" stroke="#2563EB" stroke-width="1.5"/>
+<text x="140.0" y="2356.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#1F2937" text-anchor="middle">[8][3] min_force_update</text>
+<text x="140.0" y="2371.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#1F2937" text-anchor="middle">0..v → ép restart</text>
+<rect x="290.0" y="2332.0" width="220" height="56" rx="10" fill="#FDECEC" stroke="#DC2626" stroke-width="1.5"/>
+<text x="400.0" y="2356.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#1F2937" text-anchor="middle">[7] retracted</text>
+<text x="400.0" y="2371.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#1F2937" text-anchor="middle">loại khỏi compat mọi env</text>
+<text x="40.0" y="2454.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#6B7280" text-anchor="start">Máy đã tải patch bị retract vẫn giữ nó (client không hạ cấp).</text>
+<text x="40.0" y="2476.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#6B7280" text-anchor="start">Cùng nội dung + requires → không tạo vN mới, chỉ gộp envs.</text>
+<text x="600.0" y="2234.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="start">Lệnh sự cố / quản trị</text>
+<text x="600.0" y="2260.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="start">[8][1] force-vc &lt;b&gt; &lt;p&gt; &lt;below&gt;  → bundles.json force_vc (0 = gỡ)</text>
+<text x="600.0" y="2286.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="start">[8][2] block-below N --env E  → policy.json min_allowed_patch (dry-run trước)</text>
+<text x="600.0" y="2312.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="start">[8][4] app thay thế chung  → policy.json envs.prod.replacement_app</text>
+<text x="600.0" y="2338.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="start">[9] bundle-retire / activate · ios-app-id · set-env</text>
+<text x="600.0" y="2364.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="start">[11] đổi package host → snapshot ABI → commit "đổi package host (ABI mới)"</text>
+<text x="600.0" y="2390.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="start">        sau đó: [5] build lại → [6] live → [1] patch</text>
+<text x="600.0" y="2416.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="start">[12] set-rs-domain → configs/deploy.json + config các app trong env</text>
+<text x="1270.0" y="2234.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1F2937" text-anchor="start">File chính</text>
+<text x="1270.0" y="2260.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="start">Input: configs/flutter.json · deploy.json · apps/&lt;b&gt;.json · module_abi.json</text>
+<text x="1270.0" y="2286.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="start">          apps/&lt;b&gt;/app.yaml + main_app · app/pubspec.lock (HEAD) · templates/module</text>
+<text x="1270.0" y="2312.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="start">Registry (git): abis/ · hosts/ · store/ · patches/vN · bundles.json · policy.json · compat.json</text>
+<text x="1270.0" y="2338.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="start">Publish (git): publish/&lt;env&gt;/manifest/&lt;b&gt;.json · publish/patches/*.bytecode[.gz]</text>
+<text x="1270.0" y="2364.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="start">Server: &lt;rs_domain&gt;/app/  (bytecode + manifest/&lt;b&gt;.json)</text>
+<text x="1270.0" y="2390.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="start">Sinh tạm: dist/builds · dist/app_content_*.bytecode · dist/.dynpub_changed_envs</text>
+<text x="1270.0" y="2416.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1F2937" text-anchor="start">          dist/.dynpub_pending_commit · ../main_app_package · ../app_package</text>
+</svg>

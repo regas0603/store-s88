@@ -1,0 +1,8 @@
+{
+  "ios_lookup_countries": [
+    "us"
+  ],
+  "min_allowed_patch": 0,
+  "soft_prompt": true,
+  "soft_prompt_interval_hours": 24
+}

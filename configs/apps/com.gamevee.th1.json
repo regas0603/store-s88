@@ -1,0 +1,26 @@
+{
+  "api_domain": "https://raw.githubusercontent.com/Vulcan-dev-25/configs/main/apps/api_test.json?",
+  "env": "staging",
+  "rs_domain": "https://common-s88.sandboxg1.win/",
+  "soft_prompt_interval_hours": 24,
+  "texts": {
+    "a369d755bf80": "Cancel",
+    "a369d855bf80": "Ready",
+    "a369d955bf80": "Không khởi động lại được (code={code}).",
+    "a369da55bf80": "OK",
+    "a369db55bf80": "Đã tải và cập nhật version mới (v{version}) thành công.\n\nOK: khởi động lại ứng dụng để chạy version mới ngay.\nCancel: tiếp tục phiên hiện tại — version mới sẽ tự áp dụng ở lần mở app sau.",
+    "a369dc55bf80": "Đã tải và cập nhật version mới (v{version}) thành công.\n\nOK: tắt ứng dụng — mở lại để chạy version mới ngay.\nCancel: tiếp tục phiên hiện tại — version mới sẽ tự áp dụng ở lần mở app sau.",
+    "a369dd55bf80": "Không mở được cửa hàng ứng dụng. Vui lòng thử lại.",
+    "a369de55bf80": "Cập nhật thành công",
+    "de066af0e55e": "Để sau",
+    "de066bf0e55e": "Cập nhật",
+    "de0670f0e55e": "Thử lại",
+    "de0671f0e55e": "Không thể kết nối đến server. Thử lại?",
+    "de0672f0e55e": "Lỗi Internet",
+    "de0673f0e55e": "Loading...",
+    "de0674f0e55e": "Đã có bản cập nhật mới với nhiều cải tiến. Bạn có muốn cập nhật ngay?",
+    "de0675f0e55e": "Cập nhật ngay",
+    "de0676f0e55e": "Đã có bản cập nhật mới. Vui lòng cập nhật để tiếp tục sử dụng.",
+    "de0677f0e55e": "Cập nhật mới"
+  }
+}

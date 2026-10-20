@@ -1,0 +1,19 @@
+// Tương thích plugin Android cũ (vd. fluttertoast compileSdk 33, rive_native 34)
+// với AGP 9 + androidx hiện đại — thiếu compileSdk ≥ 36 thì task
+// checkReleaseAarMetadata fail ("Dependency androidx.* requires 34 or later").
+// Nâng compileSdk của TẤT CẢ subproject có android ext lên 36 (= flutter.compileSdkVersion).
+// Chạy sau android{} block của plugin (afterEvaluate, root đăng ký TRƯỚC → chạy trước) nên
+// override được giá trị plugin tự khai.
+subprojects { sub ->
+    sub.afterEvaluate {
+        def androidExt = sub.extensions.findByName("android")
+        if (androidExt != null) {
+            def cur = null
+            try { cur = androidExt.compileSdk } catch (ignored) { cur = null }
+            if (cur == null || (cur instanceof Number && cur < 36)) {
+                androidExt.compileSdk = 36
+                println("compat: ${sub.name} compileSdk -> 36")
+            }
+        }
+    }
+}

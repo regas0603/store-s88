@@ -1,0 +1,41 @@
+{
+  "bundle": "com.example.host1",
+  "generated_at": "2026-12-01T00:00:00Z",
+  "hosts": {
+    "com.example.host1": {
+      "android": {
+        "12": {
+          "action": "soft",
+          "patch": 7,
+          "url": "market://details?id=com.example.host1"
+        },
+        "13": {
+          "patch": 14
+        }
+      },
+      "ios": {
+        "13": {
+          "patch": 14
+        }
+      }
+    }
+  },
+  "latest": 14,
+  "min_allowed_patch": 8,
+  "patches": {
+    "14": {
+      "file": "app_content_ab12cd34.bytecode",
+      "hash": "ab12cd34<sha256 hex 64 ký tự>",
+      "min_force_update": 0,
+      "size": 7700000
+    },
+    "7": {
+      "file": "app_content_73ffe17f.bytecode",
+      "hash": "73ffe17f<sha256 hex 64 ký tự>",
+      "min_force_update": 0,
+      "size": 7500000
+    }
+  },
+  "schema": 1,
+  "soft_prompt_interval_hours": 24
+}

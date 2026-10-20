@@ -1,0 +1,71 @@
+{
+  "builds": [
+    {
+      "abi_id": "2b40caa30c94b642",
+      "built_at": "2026-10-14T11:22:46Z",
+      "git_rev": "23e55a00",
+      "mode": "ddm",
+      "platform": "android",
+      "store": "live",
+      "store_at": "2026-10-14T14:18:23Z",
+      "version_code": 6,
+      "version_name": "1.0.6"
+    },
+    {
+      "abi_id": "7a52cb5ce99b99b3",
+      "built_at": "2026-10-14T14:12:49Z",
+      "git_rev": "37dfdeed",
+      "mode": "ddm",
+      "platform": "android",
+      "store": "live",
+      "store_at": "2026-10-14T14:18:44Z",
+      "version_code": 7,
+      "version_name": "1.0.7"
+    },
+    {
+      "abi_id": "9020d32f311b99da",
+      "built_at": "2026-10-15T01:38:39Z",
+      "git_rev": "69d5a634",
+      "mode": "ddm",
+      "platform": "android",
+      "store": "live",
+      "store_at": "2026-10-15T02:14:25Z",
+      "version_code": 8,
+      "version_name": "1.0.8"
+    },
+    {
+      "abi_id": "1982e55c20754eb5",
+      "built_at": "2026-10-13T07:14:49Z",
+      "git_rev": "527b816b",
+      "mode": "adhoc",
+      "platform": "ios",
+      "store": "live",
+      "store_at": "2026-10-13T08:05:52Z",
+      "version_code": 2,
+      "version_name": "1.0.2"
+    },
+    {
+      "abi_id": "1982e55c20754eb5",
+      "built_at": "2026-10-14T03:42:17Z",
+      "git_rev": "a8ef7831",
+      "mode": "adhoc",
+      "platform": "ios",
+      "store": "submitted",
+      "store_at": "2026-10-14T03:44:51Z",
+      "version_code": 3,
+      "version_name": "1.0.3"
+    },
+    {
+      "abi_id": "2b40caa30c94b642",
+      "built_at": "2026-10-14T10:30:20Z",
+      "git_rev": "cd08a59c",
+      "mode": "adhoc",
+      "platform": "ios",
+      "store": "submitted",
+      "store_at": "2026-10-14T10:45:06Z",
+      "version_code": 5,
+      "version_name": "1.0.5"
+    }
+  ],
+  "bundle_id": "com.gamevee.th1"
+}

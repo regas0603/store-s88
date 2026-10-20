@@ -1,0 +1,118 @@
+// TEMPLATE — nguon that nam o flutter-self-host/templates/module/. KHONG sua
+// ban da ap trong ../app_package/modules/ (convert_to_package.sh xoa ca thu
+// muc moi lan sinh lai). Ap lai sau moi lan convert:
+//   bash tools/dynpub.sh patch   (hoac: bash tools/cmd/modprep.sh apply)
+//
+// Wrapper duy nhat dart2bytecode nhin thay de hot toan bo man game.
+// VI TRI CHUAN (luon luon nhu nay): host = flutter-self-host/app,
+// module = ../app_package → entry compile nam trong ../app_package/modules/.
+// File nay import app_package -> moi code Dart cua B (+ dep bac cau) se
+// duoc bien dich VAO .bytecode. Host A KHONG import file nay nen B khong
+// lot vao libapp.so (da chung minh o docs/dyn_modules_android_result.md).
+//
+// Compile bang package_config cua HOST (app/.dart_tool/package_config.json)
+// nen package:content_kit/... van resolve duoc — khong can them dep nay vao
+// pubspec cua app_package.
+//
+// Hop dong content_kit v2 (docs/dynmod_build_once_plan.md P3): host dua
+// HostServices vao init(); module TU BOC ProviderScope + SunSports.init()
+// ben trong buildView() — host khong biet riverpod. Sau first frame + vai
+// giay module bao markHealthy() — host khong nhan duoc nhieu lan mo lien
+// tiep → coi ban nay hong, tu bo (rollback P6).
+import 'package:app_package/sun_sports_init.dart';
+import 'package:app_package/sun_sports_root.dart';
+import 'package:content_kit/content_kit.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+/// Thoi gian app chay on sau first frame thi bao khoe cho host.
+const Duration _kHealthyAfter = Duration(seconds: 5);
+
+/// HostServices host dua vao init() — null khi chua init.
+HostServices? _host;
+
+class InfoEntry implements ContentEntry {
+  const InfoEntry();
+
+  @override
+  String get version => '1.0.1';
+
+  @override
+  int get contractVersion => kContentContractVersion;
+
+  @override
+  Future<void> init(HostServices host) async {
+    // Chi giu HostServices. Khoi tao thuc su (SunSports.init) lam 1 LAN ben
+    // trong _InfoRoot — overrides khong di qua bien gioi host/module.
+    _host = host;
+  }
+
+  @override
+  Widget buildView(BuildContext context) => const _InfoRoot();
+
+  @override
+  Future<Object?> invoke(String method, Map<String, Object?> args) async => null;
+}
+
+/// Root tu chua: tu goi SunSports.init() roi boc ProviderScope(overrides).
+/// Fail-open: init loi → van dung SunSportsApp voi 0 override (nhu
+/// SunSports.run cu — main_patch.dart).
+class _InfoRoot extends StatefulWidget {
+  const _InfoRoot();
+
+  @override
+  State<_InfoRoot> createState() => _InfoRootState();
+}
+
+class _InfoRootState extends State<_InfoRoot> {
+  List<Override>? _overrides;
+  bool _initializing = true;
+  bool _healthScheduled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    SunSports.init().then((List<Override> overrides) {
+      if (!mounted) return;
+      setState(() {
+        _overrides = overrides;
+        _initializing = false;
+      });
+    }).catchError((Object e, StackTrace st) {
+      _host?.reportError(e, st);
+      if (!mounted) return;
+      print('[InfoRoot] SunSports.init() loi → fail-open 0 override: $e');
+      setState(() {
+        _overrides = const [];
+        _initializing = false;
+      });
+    });
+  }
+
+  /// App da ve frame dau + chay on [_kHealthyAfter] → bao khoe 1 lan.
+  void _scheduleHealthy() {
+    if (_healthScheduled) return;
+    _healthScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future<void>.delayed(_kHealthyAfter, () => _host?.markHealthy());
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_initializing) {
+      return const ColoredBox(
+        color: Color(0xFF000000),
+        child: Center(child: SizedBox(width: 32, height: 32)),
+      );
+    }
+    _scheduleHealthy();
+    return ProviderScope(
+      overrides: _overrides!,
+      child: const SunSportsApp(),
+    );
+  }
+}
+
+@pragma('dyn-module:entry-point')
+Object? infoEntrypoint() => (ContentRegistry r) => r.register(const InfoEntry());

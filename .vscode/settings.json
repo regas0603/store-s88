@@ -1,0 +1,6 @@
+{
+  // CHỈ Flutter của engine (CLAUDE.md §1): IDE tự chạy pub get khi mở / sửa
+  // pubspec — dùng Flutter khác version sẽ ghi lại pubspec.lock → lệch ABI host.
+  "dart.flutterSdkPath": "../engine/flutter-framework",
+  "dart.sdkPath": "../engine/flutter-framework/bin/cache/dart-sdk"
+}

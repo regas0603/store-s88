@@ -1,0 +1,33 @@
+name: dyn_loader
+description: >-
+  Runtime loader cho Dart Dynamic Modules (dynmod G6): check modules/check,
+  tải .bytecode, verify sha256, loadModuleFromBytes và đăng ký entry
+  vào ContentRegistry.
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  # CHỈ Flutter của engine (../engine/flutter-framework, CLAUDE.md §1): Flutter
+  # khác version bị pub từ chối ngay, không kịp ghi lại pubspec.lock.
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  crypto: ^3.0.3
+  http: ^1.2.0
+  path_provider: ^2.1.0
+  content_kit:
+    path: ../content_kit
+  # API runtime loadModuleFromBytes — lấy từ checkout engine dynmod
+  # (tools/cmd/dynmod.sh tự sửa path này trước mỗi lần build).
+  dynamic_modules:
+    path: ../../../engine/flutter/third_party/dart/pkg/dynamic_modules
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  test: ^1.25.0
+
+flutter:
+  uses-material-design: true

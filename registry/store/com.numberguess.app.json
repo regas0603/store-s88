@@ -1,0 +1,28 @@
+{
+  "builds": [
+    {
+      "abi_id": "9020d32f311b99da",
+      "built_at": "2026-10-17T02:54:53Z",
+      "git_rev": "87e3c88",
+      "mode": "ddm",
+      "platform": "android",
+      "store": "submitted",
+      "store_at": "2026-10-17T02:59:58Z",
+      "version_code": 1,
+      "version_name": "1.0.1"
+    },
+    {
+      "abi_id": "9020d32f311b99da",
+      "built_at": "2026-10-17T10:36:39Z",
+      "git_rev": "49d9df3",
+      "mode": "ddm",
+      "platform": "android",
+      "store": "live",
+      "store_at": "2026-10-17T10:38:18Z",
+      "unlock_date": "2026-10-18",
+      "version_code": 2,
+      "version_name": "1.0.2"
+    }
+  ],
+  "bundle_id": "com.numberguess.app"
+}

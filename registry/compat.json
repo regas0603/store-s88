@@ -1,0 +1,83 @@
+{
+  "pre": {
+    "abis": {
+      "1982e55c20754eb5": {
+        "first_break": null,
+        "max_patch": 1
+      },
+      "2b40caa30c94b642": {
+        "first_break": {
+          "patch": 1,
+          "reason": "shared_preferences: host 2.5.6 ≠ patch 2.5.5"
+        },
+        "max_patch": 0
+      },
+      "7a52cb5ce99b99b3": {
+        "first_break": {
+          "patch": 1,
+          "reason": "logger: host 2.6.2 ≠ patch 2.8.0; shared_preferences: host 2.5.6 ≠ patch 2.5.5; interface: host thiếu 3516 entry (vd package:archive/archive.dart, package:archive/archive_io.dart)"
+        },
+        "max_patch": 0
+      },
+      "9020d32f311b99da": {
+        "first_break": {
+          "patch": 1,
+          "reason": "logger: host 2.6.2 ≠ patch 2.8.0; shared_preferences: host 2.5.6 ≠ patch 2.5.5"
+        },
+        "max_patch": 0
+      }
+    },
+    "latest": 1
+  },
+  "prod": {
+    "abis": {
+      "1982e55c20754eb5": {
+        "first_break": null,
+        "max_patch": 0
+      },
+      "2b40caa30c94b642": {
+        "first_break": null,
+        "max_patch": 0
+      },
+      "7a52cb5ce99b99b3": {
+        "first_break": null,
+        "max_patch": 0
+      },
+      "9020d32f311b99da": {
+        "first_break": null,
+        "max_patch": 0
+      }
+    },
+    "latest": 0
+  },
+  "staging": {
+    "abis": {
+      "1982e55c20754eb5": {
+        "first_break": {
+          "patch": 2,
+          "reason": "shared_preferences: host 2.5.5 ≠ patch 2.5.6"
+        },
+        "max_patch": 1
+      },
+      "2b40caa30c94b642": {
+        "first_break": {
+          "patch": 3,
+          "reason": "logger: host 2.8.0 ≠ patch 2.6.2"
+        },
+        "max_patch": 2
+      },
+      "7a52cb5ce99b99b3": {
+        "first_break": {
+          "patch": 1,
+          "reason": "logger: host 2.6.2 ≠ patch 2.8.0; shared_preferences: host 2.5.6 ≠ patch 2.5.5; interface: host thiếu 3516 entry (vd package:archive/archive.dart, package:archive/archive_io.dart)"
+        },
+        "max_patch": 0
+      },
+      "9020d32f311b99da": {
+        "first_break": null,
+        "max_patch": 4
+      }
+    },
+    "latest": 4
+  }
+}

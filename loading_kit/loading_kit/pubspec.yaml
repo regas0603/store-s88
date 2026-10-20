@@ -1,0 +1,37 @@
+name: loading_kit
+description: Reusable boot flow, remote config, and app update UI for Flutter apps.
+version: 0.1.0
+publish_to: 'none'
+
+environment:
+  # CHỈ Flutter của engine (../engine/flutter-framework, CLAUDE.md §1): Flutter
+  # khác version bị pub từ chối ngay, không kịp ghi lại pubspec.lock.
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.1.0
+  dio: ^5.7.0
+  shared_preferences: ^2.5.3
+  # File backup cho cờ boot (bản sao song song SharedPreferences — sống sót
+  # khi update store làm mất prefs). Cùng version 2.x với app.
+  path_provider: ^2.1.0
+  # ^9.0.1: host app cần 9.x (app_package yêu cầu tối thiểu 9.x). API kit dùng
+  # chỉ có `PackageInfo.fromPlatform()` — không đổi giữa 8.x/9.x.
+  package_info_plus: ^9.0.1
+  url_launcher: ^6.3.2
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.13
+  freezed: ^3.2.3
+  json_serializable: ^6.8.0
+
+flutter:
+  uses-material-design: true

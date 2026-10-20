@@ -1,0 +1,11 @@
+{
+  "exclude_classes": [
+    "_WidgetInputBorderMapper"
+  ],
+  "deny_supertypes": [
+    "Canvas",
+    "Comparable",
+    "DateTime",
+    "Uri"
+  ]
+}

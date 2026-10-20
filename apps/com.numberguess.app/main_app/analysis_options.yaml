@@ -1,0 +1,13 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  errors:
+    # Code game chuyển từ app demo — giữ style gốc, không ép lint style mới.
+    avoid_print: ignore
+    deprecated_member_use: ignore
+    use_build_context_synchronously: ignore
+    unnecessary_import: ignore
+    unnecessary_underscores: ignore
+    curly_braces_in_flow_control_structures: ignore
+    unintended_html_in_doc_comment: ignore
+    unnecessary_string_interpolations: ignore
