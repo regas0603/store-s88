@@ -1,0 +1,41 @@
+name: main_app_package
+description: >-
+  Hit a Mole (đập chuột chũi) — màn sạch của shell cho com.hitamole.game.
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  # CHỈ Flutter của engine (../engine/flutter-framework, CLAUDE.md §1): Flutter
+  # khác version bị pub từ chối ngay, không kịp ghi lại pubspec.lock.
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Bản dịch sẵn có của Material/Cupertino cho tiếng Việt.
+  flutter_localizations:
+    sdk: flutter
+
+  # Vẽ icon nhân vật (SVG, không bị vỡ ở mọi mật độ màn hình).
+  flutter_svg: ^2.0.10
+
+  # Lưu cài đặt + thành tích. Đủ dùng cho dữ liệu phẳng, không cần sqlite.
+  shared_preferences: ^2.2.3
+
+  # Hiệu ứng âm thanh.
+  audioplayers: ^6.5.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/cards/
+    - assets/sfx/
+    - assets/branding/
