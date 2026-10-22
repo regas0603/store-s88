@@ -5,20 +5,10 @@
     "last_version_code": 8,
     "status": "active"
   },
-  "com.gamevee.th2": {
-    "force_vc": {},
-    "ios_app_id": null,
-    "status": "active"
-  },
   "com.gamevee.th3": {
     "force_vc": {},
     "ios_app_id": null,
     "last_version_code": 2,
-    "status": "active"
-  },
-  "com.gamevee.thpre": {
-    "force_vc": {},
-    "ios_app_id": null,
     "status": "active"
   },
   "com.numberguess.app": {

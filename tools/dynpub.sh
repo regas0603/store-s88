@@ -636,7 +636,10 @@ menu_host_pkg() {
     # Lock không đổi nhưng ràng buộc app_package có thể đổi mà host cũ vẫn
     # thoả (vd ^2.2.0 → ^2.5.0, host 2.5.5) → chỉ cần nhận mốc ràng buộc.
     local out
-    out="$(bash "$T/abicheck.sh" app-package 2>&1)" || { echo "$out"; die "app_package còn vi phạm ABI host — xem [FAIL] ở trên"; }
+    # exit 2 = chỉ ràng buộc đổi so với mốc (đúng việc option này nhận); 1 = vi phạm ABI.
+    local rc=0
+    out="$(bash "$T/abicheck.sh" app-package 2>&1)" || rc=$?
+    [ "$rc" = 1 ] && { echo "$out"; die "app_package còn vi phạm ABI host — xem [FAIL] ở trên"; }
     if ! grep -q "ĐỔI so với mốc" <<<"$out"; then
       info "không package host nào đổi version, ràng buộc không đổi — không có gì để nhận"
       return 0

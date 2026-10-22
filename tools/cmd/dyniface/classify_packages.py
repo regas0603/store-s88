@@ -31,6 +31,8 @@ _ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
 APP = os.environ.get("DYNMOD_APP", os.path.join(_ROOT, "app"))
 PKG_CONFIG = os.environ.get("DYNMOD_PKG_CONFIG", os.path.join(APP, ".dart_tool", "package_config.json"))
 MODULE_PKG = os.environ.get("DYNMOD_MODULE_PKG", "app_package")
+MAIN_APP_PKG = "main_app_package"
+MAIN_ONLY = set()  # classify() điền: package chỉ main_app hiện tại kéo vào
 MANIFEST = os.environ.get("DYNMOD_HOST_PACKAGES", os.path.join(_ROOT, "configs", "abi", "host_packages.yaml"))
 
 # File host tự viết tay để ghim lib — sẽ được thay bằng bản sinh (P4.1), không
@@ -193,13 +195,27 @@ def classify():
     def is_excluded_name(n):
         return n in EXCLUDED_NAMES or n.endswith(EXCLUDED_SUFFIXES)
 
-    reach, stack = set(), list(roots)
-    while stack:
-        n = stack.pop()
-        if n in reach or is_excluded_name(n):
-            continue
-        reach.add(n)
-        stack.extend(deps.get(n, []))
+    def reach_from(skip_main_app, extra=()):
+        reach, stack = set(), list(roots) + list(extra)
+        while stack:
+            n = stack.pop()
+            if n in reach or is_excluded_name(n):
+                continue
+            reach.add(n)
+            if not (skip_main_app and n == MAIN_APP_PKG):
+                stack.extend(deps.get(n, []))
+        return reach
+
+    reach = reach_from(False)
+    # Package CHỈ main_app hiện tại kéo vào (flame, share_plus… của 1 app): riêng
+    # app đó, không thuộc bộ host chung → không xếp tầng, không vào manifest
+    # (abicheck main-app kiểm từng app). Package đã có trong manifest (vd
+    # flutter_localizations: đã duyệt đưa lên host cho mọi main_app) vẫn là chung.
+    listed = set()
+    if os.path.isfile(MANIFEST):
+        listed = {n for names in parse_manifest(MANIFEST).values() for n in names if n in pkgs}
+    MAIN_ONLY.clear()
+    MAIN_ONLY.update(reach - reach_from(True, listed))
 
     # Dep KHAI trong pubspec phía module nhưng chưa import ở đâu: không vào
     # kernel hôm nay, nhưng module được phép dùng sau → module_allowed.
@@ -221,9 +237,12 @@ def classify():
     live = [n for n in pkgs if n != app_name and tier.get(n) != "excluded"]
 
     # 2. Tầng theo luật trực tiếp.
+    # KHÔNG tính main_app_package: ../main_app_package là main_app của app build
+    # gần nhất (đổi theo app) — nó không được quyết định tầng của bộ host chung.
+    # Package main_app import chỉ cần ở host (t1 đạt) — xem bước 3.
     host_code = imported_packages([
         os.path.join(APP, "lib"),
-        *[os.path.join(pkgs[p], "lib") for p in ("loading_kit", "content_kit", "dyn_loader", "main_app_package") if p in pkgs],
+        *[os.path.join(pkgs[p], "lib") for p in ("loading_kit", "content_kit", "dyn_loader") if p in pkgs],
     ])
     internal = {n for n in live if module_root and pkgs[n].startswith(os.path.dirname(module_root.rstrip("/")) + "/" + MODULE_PKG)}
 
@@ -262,7 +281,7 @@ def classify():
         for n in live:
             if RANK[tier[n]] < 1:
                 continue
-            want = "t0_required" if tier[n] in ("t0_required", "sdk") else "t1_frozen_pure_dart"
+            want = "t0_required" if tier[n] in ("t0_required", "sdk") and n != MAIN_APP_PKG else "t1_frozen_pure_dart"
             for d in deps.get(n, []):
                 if tier.get(d) == "excluded" or d not in tier:
                     continue
@@ -271,6 +290,9 @@ def classify():
                         pulled[d] = n
                     tier[d], why[d] = want, "dep bắc cầu của %s" % n
                     changed = True
+    for n in MAIN_ONLY:
+        tier.pop(n, None)
+        why.pop(n, None)
     return pkgs, deps, tier, why, pulled
 
 
@@ -413,6 +435,9 @@ def cmd_check():
         for e in errs:
             print("  \033[31m[FAIL]\033[0m " + e)
         return 1
+    if MAIN_ONLY:
+        print("  [i]    bỏ qua %d package riêng của main_app hiện tại (abicheck main-app kiểm): %s"
+              % (len(MAIN_ONLY), ", ".join(sorted(MAIN_ONLY))))
     print("== check host_packages.yaml: OK (%d package, mỗi package đúng 1 tầng) ==" % len(where))
     return 0
 

@@ -19,7 +19,7 @@ Lệnh:
                         version phải được bản host đóng băng thoả; báo ràng
                         buộc đổi so với lần chấp nhận trước
                         (configs/abi/app_package_deps.json). --accept = ghi mốc mới.
-Exit 0 = OK, 1 = có lỗi.
+Exit 0 = OK, 1 = có lỗi, 2 = (app-package) chỉ ràng buộc đổi so với mốc, chưa nhận.
 """
 import hashlib
 import json
@@ -444,7 +444,7 @@ def cmd_app_package(pkg_dir, accept):
     if os.path.isdir(pk):
         files += sorted(os.path.join(pk, d, "pubspec.yaml") for d in os.listdir(pk)
                         if os.path.isfile(os.path.join(pk, d, "pubspec.yaml")))
-    current, errs = {}, 0
+    current, errs, drift = {}, 0, False
     for f in files:
         rel = os.path.relpath(f, pkg_dir)
         cons = pubspec_constraints(f)
@@ -472,7 +472,10 @@ def cmd_app_package(pkg_dir, accept):
                     tag = "host" if dep in frozen else "module"
                     changes.append(f"{rel}: {dep} {a.get(dep, '(chưa có)')} → {b.get(dep, '(bỏ)')}  [{tag}]")
         if changes:
-            warn(f"{len(changes)} ràng buộc version ĐỔI so với mốc đã chấp nhận "
+            # FAIL (exit 2, khác vi phạm ABI = exit 1): đổi ràng buộc package host
+            # chưa được nhận = có thể đổi ABI host → phải duyệt qua dynpub [11].
+            drift = True
+            bad(f"{len(changes)} ràng buộc version ĐỔI so với mốc đã chấp nhận "
                  f"({os.path.relpath(DEPS_FILE, ROOT)}):")
             for c in changes:
                 print("         " + c)
@@ -487,7 +490,7 @@ def cmd_app_package(pkg_dir, accept):
                 json.dump(current, f, indent=2, sort_keys=True)
                 f.write("\n")
             ok(f"đã ghi mốc ràng buộc → {os.path.relpath(DEPS_FILE, ROOT)}")
-    return 1 if errs else 0
+    return 1 if errs else (2 if drift else 0)
 
 
 def main():

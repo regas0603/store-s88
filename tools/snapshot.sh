@@ -38,7 +38,7 @@ else
 fi
 PKG_OUT="$(bash "$T/abicheck.sh" app-package)" || CHANGED=1
 echo "$PKG_OUT"
-grep -q "WARN" <<<"$PKG_OUT" && CHANGED=1
+grep -q "ĐỔI so với mốc" <<<"$PKG_OUT" && CHANGED=1
 
 if [ "$CHANGED" = 0 ]; then
   echo
