@@ -220,6 +220,23 @@ def scan_imports(lib_dir):
     return out
 
 
+def module_uses(pkg_dir=MODULE_PKG_DIR):
+    """(package module import trực tiếp, package trong pubspec.lock module) —
+    quét lib/, modules/, packages/*/lib của app_package. (None, None) nếu chưa có."""
+    if not os.path.isdir(pkg_dir):
+        return None, None
+    dirs = [os.path.join(pkg_dir, "lib"), os.path.join(pkg_dir, "modules")]
+    pkgs = os.path.join(pkg_dir, "packages")
+    if os.path.isdir(pkgs):
+        dirs += [os.path.join(pkgs, d, "lib") for d in sorted(os.listdir(pkgs))]
+    imports = set()
+    for d in dirs:
+        if os.path.isdir(d):
+            imports |= scan_imports(d)
+    lock = os.path.join(pkg_dir, "pubspec.lock")
+    return imports, set(read_lock(lock)) if os.path.isfile(lock) else set()
+
+
 def absolutize_pubspec(text, base):
     """Đổi mọi `path: <tương đối>` thành tuyệt đối (so với base)."""
     def fix(m):
@@ -268,8 +285,21 @@ def cmd_main_app(src):
             f"module nạp lỗi 'already loaded'")
         errs += 1
     new = sorted(imports - host - module - {"flutter"})
-    for n in new:
-        warn(f"main_app import package mới (ngoài manifest): {n} — vào host; ổn nếu module không dùng")
+    if new:
+        mod_imp, mod_lock = module_uses()
+        for n in new:
+            if mod_imp is None:
+                warn(f"main_app import package mới (ngoài manifest): {n} — vào host; "
+                     f"không thấy {MODULE_PKG_DIR} để kiểm module có dùng không")
+            elif n in mod_imp:
+                bad(f"main_app import package mới (ngoài manifest): {n} — module CŨNG import → "
+                    f"host chưa lộ / module mang bản riêng → compile lỗi hoặc 'already loaded'")
+                errs += 1
+            elif n in mod_lock:
+                warn(f"main_app import package mới (ngoài manifest): {n} — module không import trực tiếp "
+                     f"nhưng có trong pubspec.lock module (bắc cầu) → kiểm lại")
+            else:
+                info(f"main_app import package mới (ngoài manifest): {n} — vào host, module không dùng")
     if not leak:
         ok(f"main_app import {len(imports)} package, không chạm package module")
 
