@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/theme.dart';
 import '../../game/models/card_icon.dart';
@@ -183,11 +182,22 @@ class _Critter extends StatelessWidget {
     final current = icon;
     final Widget body = current == null
         ? CustomPaint(painter: _MolePainter(dazed: dazed))
-        : Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: SvgPicture.asset(current.asset, package: 'main_app_package', fit: BoxFit.contain),
+        // Neo đáy rồi đẩy xuống một chút để nhân vật bị miệng hang cắt chân,
+        // giống chuột chũi vẽ tay. Căn theo đỉnh sẽ làm icon lơ lửng phía trên
+        // hang — lộ rõ nhất ở nhóm đồ vật/trái cây vì PNG emoji chừa sẵn lề
+        // trong suốt quanh hình.
+        : Align(
+            alignment: Alignment.bottomCenter,
+            child: FractionalTranslation(
+              translation: const Offset(0, 0.1),
+              child: Image.asset(
+                current.asset,
+                package: 'main_app_package',
+                fit: BoxFit.contain,
+                // Con chỉ ở trên mặt đất dưới một giây: lọc mượt khi thu nhỏ
+                // đáng giá hơn vài micro-giây tiết kiệm được.
+                filterQuality: FilterQuality.medium,
+              ),
             ),
           );
 

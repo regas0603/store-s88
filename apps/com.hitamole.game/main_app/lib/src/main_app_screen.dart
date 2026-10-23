@@ -7,7 +7,7 @@ import 'data/stats_repository.dart';
 import 'services/sound_service.dart';
 
 /// Màn "sạch" của shell: nạp cài đặt + thành tích + âm thanh 1 lần (trước đây
-/// nằm ở main() của app demo) rồi dựng [HitAMoleApp] (MaterialApp riêng cho
+/// nằm ở main() của app gốc) rồi dựng [HitAMoleApp] (MaterialApp riêng cho
 /// theme/locale theo cài đặt — giống cấu trúc app gốc).
 class MainAppScreen extends StatefulWidget {
   const MainAppScreen({super.key});
@@ -37,6 +37,7 @@ class _MainAppScreenState extends State<MainAppScreen> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    // Nạp song song — cả hai đều đọc shared_preferences, không phụ thuộc nhau.
     await Future.wait<void>(<Future<void>>[_settings.load(), _stats.load()]);
     await _sound.init();
     await _syncSound();

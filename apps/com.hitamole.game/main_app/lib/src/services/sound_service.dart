@@ -4,11 +4,6 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-/// Asset nằm trong main_app_package → prefix riêng từng player (không đổi
-/// AudioCache.instance — dùng chung với module).
-final AudioCache _packageAudioCache =
-    AudioCache(prefix: 'packages/main_app_package/assets/');
-
 /// Các hiệu ứng âm thanh của game. Tên enum khớp tên file trong assets/sfx/.
 enum Sfx { tap, flip, match, mismatch, win }
 
@@ -16,6 +11,11 @@ extension SfxX on Sfx {
   /// audioplayers tự thêm tiền tố `assets/`, nên chỉ ghi đường dẫn tương đối.
   String get assetPath => 'sfx/$name.wav';
 }
+
+/// Asset nằm trong main_app_package → prefix riêng từng player (không đổi
+/// AudioCache.instance — dùng chung với module).
+final AudioCache _packageAudioCache =
+    AudioCache(prefix: 'packages/main_app_package/assets/');
 
 /// Cổng duy nhất ra âm thanh và rung.
 ///

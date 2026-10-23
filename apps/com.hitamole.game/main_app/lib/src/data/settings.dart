@@ -95,13 +95,4 @@ class Settings {
     );
   }
 
-  /// Cấu hình ván mới dựng từ tuỳ chọn hiện tại.
-  GameConfig configFor(GameMode mode) => GameConfig(
-        mode: mode,
-        boardSize: boardSize,
-        aiDifficulty: aiDifficulty,
-        boardDifficulty: boardDifficulty,
-        category: cardCategory,
-        countdownSeconds: countdownSeconds,
-      );
 }

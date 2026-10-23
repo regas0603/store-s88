@@ -127,9 +127,6 @@ class GameController extends ChangeNotifier {
       ? (_engine.currentPlayer + 1) % _engine.playerCount
       : _engine.currentPlayer;
 
-  /// Đang đếm ngược để chuyền máy cho người kế tiếp.
-  bool get isHandoff => _turnPending;
-
   Duration get elapsed => _stopwatch.elapsed;
 
   /// Số giây đếm ngược còn lại (0 nếu không ở giai đoạn đó).

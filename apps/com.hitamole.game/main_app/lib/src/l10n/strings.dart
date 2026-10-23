@@ -37,8 +37,6 @@ class AppStrings {
       'Hit the moles. Train your reflexes.');
   String get cancel => _t('Huỷ', 'Cancel');
   String get confirm => _t('Đồng ý', 'Confirm');
-  String get close => _t('Đóng', 'Close');
-  String get back => _t('Quay lại', 'Back');
 
   // -------------------------------------------------------------- tutorial
   String get skip => _t('Bỏ qua', 'Skip');
@@ -88,7 +86,6 @@ class AppStrings {
   String get vsAiRecord => _t('Thành tích đấu AI', 'AI record');
 
   // ------------------------------------------------------------ thiết lập ván
-  String get newGame => _t('Ván mới', 'New game');
   String get boardSizeLabel => _t('Cỡ bàn', 'Board size');
   String get difficultyLabel => _t('Độ khó', 'Difficulty');
   String get aiSkillLabel => _t('Trình độ AI', 'AI skill');

@@ -18,14 +18,11 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # Vẽ icon nhân vật (SVG, không bị vỡ ở mọi mật độ màn hình).
-  flutter_svg: ^2.0.10
-
   # Lưu cài đặt + thành tích. Đủ dùng cho dữ liệu phẳng, không cần sqlite.
   shared_preferences: ^2.2.3
 
   # Hiệu ứng âm thanh.
-  audioplayers: ^6.5.1
+  audioplayers: ^6.0.0
 
 dev_dependencies:
   flutter_test:

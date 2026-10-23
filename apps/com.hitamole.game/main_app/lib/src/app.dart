@@ -1,4 +1,4 @@
-import 'data/settings.dart';
+import 'package:main_app_package/src/data/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 

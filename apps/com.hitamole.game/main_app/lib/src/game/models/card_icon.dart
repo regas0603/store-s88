@@ -22,7 +22,7 @@ class CardIcon {
 
   const CardIcon(this.id, this.labelVi, this.labelEn, this.category);
 
-  String get asset => 'assets/cards/$id.svg';
+  String get asset => 'assets/cards/$id.png';
 
   String label(String languageCode) => languageCode == 'en' ? labelEn : labelVi;
 

@@ -35,6 +35,12 @@ class _GameScreenState extends State<GameScreen> {
   GameController? _controller;
   bool _resultShown = false;
 
+  /// Ván bị tạm dừng chỉ để dựng hộp xác nhận thoát, chứ người chơi không hề
+  /// mở menu tạm dừng. Khi đó phải giấu [_PauseOverlay], nếu không sẽ thấy hai
+  /// lớp thoát game chồng nhau: "Restart / Quit" của menu nằm ngay sau hộp
+  /// thoại "Quit this game?".
+  bool _pausedForQuitDialog = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -117,7 +123,12 @@ class _GameScreenState extends State<GameScreen> {
 
     final wasPlaying = controller.phase != GamePhase.paused &&
         controller.phase != GamePhase.finished;
-    if (wasPlaying) controller.pause();
+    if (wasPlaying) {
+      // Dừng đồng hồ để người chơi không mất thời gian lúc đang cân nhắc,
+      // nhưng giấu menu tạm dừng vì họ không yêu cầu mở nó.
+      setState(() => _pausedForQuitDialog = true);
+      controller.pause();
+    }
 
     final shouldQuit = await showDialog<bool>(
       context: context,
@@ -141,7 +152,11 @@ class _GameScreenState extends State<GameScreen> {
 
     if (shouldQuit == true) {
       Navigator.of(context).pop();
-    } else if (wasPlaying) {
+      return;
+    }
+
+    if (wasPlaying) {
+      setState(() => _pausedForQuitDialog = false);
       controller.resume();
     }
   }
@@ -225,7 +240,7 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                   ],
                 ),
-                if (isPaused)
+                if (isPaused && !_pausedForQuitDialog)
                   _PauseOverlay(
                     onResume: controller.resume,
                     onRestart: () {

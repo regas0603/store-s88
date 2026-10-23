@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/app_scope.dart';
 import '../../core/theme.dart';
@@ -13,9 +12,9 @@ import 'tutorial_screen.dart';
 
 /// Màn hình mở đầu.
 ///
-/// Ngoài việc tạo nhận diện, splash còn che khoảng thời gian `flutter_svg`
-/// biên dịch lần đầu các file SVG nhân vật. Warm cache ngay tại đây thì con
-/// đầu tiên trồi lên ở ván đầu không bị khựng.
+/// Ngoài việc tạo nhận diện, splash còn che khoảng thời gian giải mã lần đầu
+/// các PNG nhân vật. Warm cache ngay tại đây thì con đầu tiên trồi lên ở ván
+/// đầu không bị khựng.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -50,10 +49,7 @@ class _SplashScreenState extends State<SplashScreen>
     final category = AppScope.of(context).settings.value.cardCategory;
     if (category == null) return;
     for (final icon in CardIcons.byCategory(category)) {
-      final loader = SvgAssetLoader(icon.asset);
-      svg.cache
-          .putIfAbsent(loader.cacheKey(context), () => loader.loadBytes(context))
-          .ignore();
+      precacheImage(AssetImage(icon.asset, package: 'main_app_package'), context).ignore();
     }
   }
 
