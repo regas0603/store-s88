@@ -11,7 +11,8 @@ Lệnh (tools/dynpub.sh gọi):
   ios-check <bundle>                   build iOS: chọn kiểu ký — profile đã cài trên máy
                                        → Manual (trống thì tự tìm, ghi app.yaml); không có
                                        → Automatic (Xcode đã đăng nhập tài khoản của team)
-  xcconfig <bundle> <out>              ghi AppIdentity.xcconfig
+  xcconfig <bundle> <out> [mode]       ghi AppIdentity.xcconfig (mode appstore + Automatic →
+                                       archive ký Apple Distribution, không cần device)
   export-plist <bundle> <adhoc|appstore> <out>
   icons-apply <bundle> <backup_dir>    backup icon gốc → sinh icon từ app.yaml
   icons-restore <backup_dir>           chép icon gốc về
@@ -317,7 +318,7 @@ def cmd_ios_check(bundle):
     return 0
 
 
-def cmd_xcconfig(bundle, out):
+def cmd_xcconfig(bundle, out, mode=None):
     cfg = load(bundle)
     plan = sign_plan(bundle) if cfg.get("ios") is not None else {"team": None, "profile": None,
                                                                  "archive_style": "Automatic"}
@@ -327,6 +328,11 @@ def cmd_xcconfig(bundle, out):
         f"APP_DISPLAY_NAME = {cfg.get('display_name') or 'App'}",
         f"APP_SIGN_STYLE = {plan['archive_style']}",
     ]
+    # Automatic + identity Development cần profile Development → Apple bắt team có
+    # ít nhất 1 device đăng ký. Bản App Store archive thẳng bằng Apple Distribution:
+    # Xcode tạo profile App Store, không cần device.
+    if mode == "appstore" and plan["archive_style"] == "Automatic":
+        lines.append("APP_SIGN_IDENTITY = Apple Distribution")
     if plan["team"]:
         lines.append(f"APP_TEAM_ID = {plan['team']}")
     # Automatic: PROVISIONING_PROFILE_SPECIFIER phải rỗng (Xcode báo xung đột nếu có).
@@ -444,7 +450,7 @@ def main(a):
     if cmd == "ios-check":
         return cmd_ios_check(a[1])
     if cmd == "xcconfig":
-        return cmd_xcconfig(a[1], a[2])
+        return cmd_xcconfig(a[1], a[2], a[3] if len(a) > 3 else None)
     if cmd == "export-plist":
         return cmd_export_plist(a[1], a[2], a[3])
     if cmd == "icons-apply":

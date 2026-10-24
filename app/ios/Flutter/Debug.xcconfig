@@ -3,6 +3,8 @@
 // Kiểu ký mặc định (mở Xcode tay); AppIdentity.xcconfig ghi đè: profile có
 // trên máy → Manual, không → Automatic (Xcode đã đăng nhập tài khoản team).
 APP_SIGN_STYLE = Manual
+// Identity ký thiết bị; bản App Store ký Automatic → Apple Distribution.
+APP_SIGN_IDENTITY = iPhone Developer
 // Danh tính app (bundle id, tên, team, profile, kiểu ký) — tools/dynpub.sh /
 // run.sh ghi theo apps/<bundleId>/app.yaml (gitignore). Không có giá trị mặc
 // định nào khác.

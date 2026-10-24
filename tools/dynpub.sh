@@ -532,6 +532,7 @@ build_host() {
     case "$m" in
       adhoc|appstore)
         plist="$(mktemp -t dynpub_export).plist"
+        idt xcconfig "$b" "$XCCONFIG_OUT" "$m"
         idt export-plist "$b" "$m" "$plist"
         build_ipa "$m" "$ver" "$plist"; reg_mode="$m" ;;
       debug|profile) build_ipa "$m" "$ver" ;;

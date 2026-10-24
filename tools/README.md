@@ -178,5 +178,8 @@ lại) → ký **Manual**; không có → ký **Automatic** — Xcode → Settin
 profile (`flutter build ipa` truyền sẵn `-allowProvisioningUpdates`). Archive và
 export quyết định riêng (vd có profile Development nhưng chưa có App Store →
 archive Manual, export automatic). Project đọc `CODE_SIGN_STYLE = $(APP_SIGN_STYLE)`
-(mặc định Manual trong `Flutter/{Debug,Release}.xcconfig`). Máy khác vẫn cần
+(mặc định Manual trong `Flutter/{Debug,Release}.xcconfig`). Bản **App Store** ký
+Automatic thì archive bằng `Apple Distribution` (`APP_SIGN_IDENTITY`) → Xcode tạo
+profile App Store, không cần team có device đăng ký (profile Development thì cần).
+Bản ad-hoc vẫn cần device trong team. Máy khác vẫn cần
 private key của cert Distribution nếu ký Manual (export `.p12` từ máy cũ).
