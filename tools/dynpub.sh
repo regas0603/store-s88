@@ -446,6 +446,9 @@ build_ipa() {
       [ -f "$IFACE" ] || die "thiếu $IFACE sau bootstrap"
       local IFACE_HOST; IFACE_HOST="$(host_iface "$IFACE")" \
         || die "sinh dynamic_interface.host.yaml thất bại"
+      [ -d "$(engine_src)/out/ios_release/Flutter.xcframework/ios-arm64/dSYMs/Flutter.framework.dSYM" ] \
+        || echo "  [WARN] engine ios_release chưa có dSYM Flutter.framework → App Store Connect sẽ báo thiếu dSYM" \
+                "(máy build engine: bash tools/cmd/dynmod.sh dsym rồi dynmod.sh backup)"
       engine_args=(
         "--local-engine-src-path=$(engine_src)"
         "--local-engine=ios_release"

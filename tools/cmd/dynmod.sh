@@ -18,6 +18,7 @@
 #   bash tools/cmd/dynmod.sh module [module.dart] [--entry <file trong lib/>] [-o out.bytecode]
 #   bash tools/cmd/dynmod.sh status                      # engine nào đã build, có interpreter chưa
 #   bash tools/cmd/dynmod.sh backup [thư_mục_đích]       # chép engine đã build (bỏ obj/) để dùng lại
+#   bash tools/cmd/dynmod.sh dsym                        # sinh dSYM Flutter.framework cho out/ios_release
 #   bash tools/cmd/dynmod.sh watch <host|android|ios>    # doi build nen xong -> notification + file DONE/FAIL
 #   bash tools/cmd/dynmod.sh env                         # in cac bien DYNMOD_* dang dung
 #
@@ -271,6 +272,37 @@ build_one() {  # <host|android|ios> <sjfix 0|1>
   else die "out/$od build xong nhưng KHÔNG thấy interpreter — kiểm tra args.gn"; fi
   # Stamp revision → setup/doctor biết engine build từ version nào (đổi configs/flutter.json = build lại)
   { git -C "$FF_SRC" rev-parse HEAD; echo "$REV"; } > "$OUT/$od/$(bash "$ROOT/tools/cmd/flutter_version.sh" --stamp-name)"
+  if [ "$t" = ios ]; then ios_dsym "$OUT/$od"; fi
+}
+
+# dSYM của Flutter.framework (engine ios): binary đã strip, DWARF nằm trong obj/ của
+# checkout build → dsymutil theo debug map. Đặt vào xcframework/ios-arm64/dSYMs/ —
+# flutter_tools (local engine) tự chép vào build → archive có dSYM, App Store Connect
+# không báo "archive did not include a dSYM for the Flutter.framework".
+# Chỉ chạy được ở máy còn obj/ (../dart-sdk-build); backup chép kèm sang ../engine.
+ios_dsym() {  # <out_dir ios_release>
+  local od="$1"
+  local bin="$od/Flutter.xcframework/ios-arm64/Flutter.framework/Flutter"
+  local dsym="$od/Flutter.xcframework/ios-arm64/dSYMs/Flutter.framework.dSYM"
+  [ -f "$bin" ] || die "không thấy $bin"
+  local want have
+  want="$(dwarfdump --uuid "$bin" | awk '{print $2}')"
+  have="$(dwarfdump --uuid "$dsym" 2>/dev/null | awk '{print $2}' || true)"
+  if [ -n "$want" ] && [ "$have" = "$want" ]; then
+    ok "dSYM Flutter.framework khớp UUID $want"; return 0
+  fi
+  [ -d "$od/obj" ] || die "thiếu $od/obj (object của bản build) → không sinh được dSYM; chạy ở máy build engine"
+  rm -rf "$dsym"
+  mkdir -p "$(dirname "$dsym")"
+  mkdir -p "$LOGDIR"
+  local log="$LOGDIR/dsym-ios-$(date +%Y%m%d-%H%M%S).log"
+  info "dsymutil Flutter.framework… (log: $log — cảnh báo thiếu .pcm/.pch là bình thường)"
+  dsymutil "$bin" -o "$dsym" > "$log" 2>&1 || die "dsymutil thất bại — xem $log"
+  have="$(dwarfdump --uuid "$dsym" 2>/dev/null | awk '{print $2}' || true)"
+  [ "$have" = "$want" ] || die "dSYM sinh ra lệch UUID (${have:-rỗng} ≠ $want)"
+  local cus; cus="$(dwarfdump --debug-info "$dsym" 2>/dev/null | grep -c DW_TAG_compile_unit || true)"
+  [ "${cus:-0}" -gt 0 ] || die "dSYM không có DWARF — obj/ build không kèm debug info?"
+  ok "dSYM Flutter.framework → $dsym ($(du -sh "$dsym" | cut -f1), $cus compile unit)"
 }
 
 cmd_engine() {
@@ -575,6 +607,7 @@ cmd_backup() {
     if ! OUT="$src_out" has_interpreter "$(OUT="$src_out" engine_binary "$od")"; then
       info "bỏ qua out/$od (chưa build xong / không có interpreter)"; continue
     fi
+    if [ "$od" = ios_release ]; then ios_dsym "$src_out/$od"; fi
     rsync -a --delete --exclude='obj/' --exclude='*_unittests' --exclude='*_unittests.*' \
       --exclude='compile_commands.json' --exclude='gn_trace.json' --exclude='gen/*_test.dart.dill*' \
       "$src_out/$od/" "$dest/out/$od/"
@@ -657,5 +690,6 @@ case "${1:-}" in
   module) shift; cmd_module "$@" ;;
   status) cmd_status ;;
   backup) shift; cmd_backup "$@" ;;
+  dsym)   ios_dsym "$SRC/out/ios_release" ;;
   *) sed -n '2,22p' "$0"; exit 1 ;;
 esac

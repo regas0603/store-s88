@@ -21,6 +21,7 @@
 #   1. Preflight   : git, node>=20, python3, Xcode, Metal Toolchain
 #                    (KHÔNG cần flutter trong PATH — dùng ../engine/flutter-framework)
 #   2. Engine ddm  : host + android + ios (build cái nào thiếu)
+#                    + dSYM Flutter.framework (ios) nếu thiếu — sinh từ obj/ của checkout
 #   2b. app_package: ../app_package (module) phải có — SINH RA bởi
 #                    ../s88-flutter/convert_to_package.sh, setup không tự tạo;
 #                    thiếu thì báo cách tạo + bỏ qua bước 3-5
@@ -187,6 +188,23 @@ else
       ENGINE_SRC="$ENG_COPY"; OUT="$ENGINE_SRC/out"
     else
       bad "chép engine sang $ENG_COPY thất bại"
+    fi
+  fi
+  # dSYM Flutter.framework (App Store Connect đòi): engine build trước khi có bước
+  # này thì thiếu → sinh từ obj/ của checkout rồi chép sang bản đang dùng.
+  DSYM_REL="out/ios_release/Flutter.xcframework/ios-arm64/dSYMs/Flutter.framework.dSYM"
+  if [ "$BUILD_FAIL" = 0 ] && engine_ok ios; then
+    if [ -d "$ENGINE_SRC/$DSYM_REL" ]; then
+      skip "dSYM Flutter.framework đã có"
+    elif [ -d "$BUILD_FF/engine/src/out/ios_release/obj" ]; then
+      if run bash "$DYNMOD" dsym && { [ "$ENGINE_SRC" = "$BUILD_FF/engine/src" ] \
+           || { run mkdir -p "$(dirname "$ENGINE_SRC/$DSYM_REL")" && run rsync -a --delete "$BUILD_FF/engine/src/$DSYM_REL" "$(dirname "$ENGINE_SRC/$DSYM_REL")/"; }; }; then
+        pass "dSYM Flutter.framework → $ENGINE_SRC/$DSYM_REL"
+      else
+        bad "sinh dSYM Flutter.framework thất bại — chạy tay: bash tools/cmd/dynmod.sh dsym"
+      fi
+    else
+      warn "engine ios thiếu dSYM Flutter.framework, máy này không có obj/ để sinh → chép thư mục $DSYM_REL từ máy build engine (App Store Connect sẽ báo thiếu dSYM)"
     fi
   fi
 fi
