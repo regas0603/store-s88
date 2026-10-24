@@ -1,6 +1,6 @@
 name: main_app_package
 description: >-
-  Hit a Mole (đập chuột chũi) — màn sạch của shell cho com.hitamole.game.
+  Mole Duel (đập chuột chũi) — màn sạch của shell cho com.hitamole.game.
 publish_to: 'none'
 version: 1.0.0
 

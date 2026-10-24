@@ -33,7 +33,7 @@ class HitAMoleApp extends StatelessWidget {
         builder: (context, _) {
           final value = settings.value;
           return MaterialApp(
-            title: 'Hit a Mole',
+            title: 'Mole Duel',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.light(),
             darkTheme: AppTheme.dark(),

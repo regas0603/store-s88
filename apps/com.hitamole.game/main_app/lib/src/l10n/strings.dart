@@ -32,7 +32,7 @@ class AppStrings {
   String _t(String vi, String en) => isEnglish ? en : vi;
 
   // ---------------------------------------------------------------- chung
-  String get appName => 'Hit a Mole';
+  String get appName => 'Mole Duel';
   String get tagline => _t('Đập chuột chũi. Luyện phản xạ.',
       'Hit the moles. Train your reflexes.');
   String get cancel => _t('Huỷ', 'Cancel');

@@ -17,7 +17,7 @@ class MainAppMeta {
 }
 
 final MainAppMeta mainAppMeta = MainAppMeta(
-  appTitle: 'Hit a Mole',
-  appName: 'Hit a Mole',
+  appTitle: 'Mole Duel',
+  appName: 'Mole Duel',
   theme: AppTheme.light(),
 );

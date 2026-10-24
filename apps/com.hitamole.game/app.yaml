@@ -1,7 +1,7 @@
 # Thông tin build của app — dynpub.sh đọc khi build host cho bundle này.
 # KHÔNG commit file ký/mật khẩu: chỉ ghi đường dẫn (ngoài repo).
 bundle_id: com.hitamole.game
-display_name: Hit a Mole
+display_name: Mole Duel
 # Icon vuông PNG >= 1024x1024 (tương đối thư mục này).
 icon: assets/icon.png
 android:
