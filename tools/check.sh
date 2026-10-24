@@ -6,6 +6,9 @@
 #   bash tools/check.sh --pkg <dir>              # app_package ở chỗ khác (mặc định ../app_package)
 #
 # Làm gì:
+#   0. cục bộ      : package_config + dist/dynamic_interface.yaml (git ignore)
+#                    lệch repo (vd pull đổi ABI host) → tự pub get / dyniface
+#                    bootstrap bằng Flutter engine; pub get đổi lock = FAIL
 #   1. app_package : áp templates/module (modules/home_content.dart) + kiểm
 #                    (modprep): API, nhánh VM không chạm web, ranh giới
 #                    host/module, VERSION package không lệch host đóng băng
@@ -56,6 +59,30 @@ app_label() {
   else echo "$d"; fi
 }
 
+# Bước 0: package_config + dist/dynamic_interface.yaml là file sinh ở từng máy
+# (git ignore). Sau `git pull` có đổi ABI host chúng cũ → bước 1 báo lỗi giả
+# ("không còn trong package_config", "host CHƯA lộ"). Tự sinh lại bằng Flutter
+# engine để mọi máy check giống nhau; pub get làm đổi lock = FAIL (Flutter sai).
+sync_local() {
+  if ! python3 -B "$T/localstate.py" pkgconfig; then
+    echo "  → pub get (Flutter engine)…"
+    local before; before="$(shasum -a 256 "$ROOT/app/pubspec.lock")"
+    bash "$T/dynmod.sh" pubget || return 1
+    if [ "$(shasum -a 256 "$ROOT/app/pubspec.lock")" != "$before" ]; then
+      echo "  ${RED}[FAIL]${RST} pub get làm đổi app/pubspec.lock — Flutter / package lệch (CLAUDE.md §1)."
+      echo "         Khôi phục: git checkout -- app/pubspec.lock && bash tools/cmd/dynmod.sh pubget"
+      python3 -B "$T/lockcheck.py"
+      return 1
+    fi
+    python3 -B "$T/localstate.py" pkgconfig || return 1
+  fi
+  if ! python3 -B "$T/localstate.py" iface; then
+    echo "  → sinh lại anchor + iface: bash tools/cmd/dyniface.sh bootstrap…"
+    bash "$T/dyniface.sh" bootstrap || return 1
+    python3 -B "$T/localstate.py" iface || return 1
+  fi
+}
+run_step "0. trạng thái cục bộ — package_config + dist/dynamic_interface.yaml khớp repo" sync_local
 run_step "1. app_package — áp template + kiểm ($PKG)" bash "$T/modprep.sh" apply --pkg "$PKG"
 for d in "${MAIN_APPS[@]}"; do
   run_step "2. $(app_label "$d") — main_app không kéo package module vào host" \

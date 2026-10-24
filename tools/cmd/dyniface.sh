@@ -253,6 +253,9 @@ cmd_bootstrap() {
   ok "anchor: $(basename "$anchor") ($(stat -f%z "$anchor") B)"
   export DYNIFACE_ANCHOR="$anchor"
   cmd_gen --regen
+  # Dấu đầu vào: tools/check.sh bước 0 biết iface còn khớp repo không (máy khác
+  # pull đổi ABI host mà chưa bootstrap → tự sinh lại thay vì báo lỗi giả).
+  python3 -B "$ROOT/tools/cmd/localstate.py" iface-write
 }
 
 case "${1:-}" in
