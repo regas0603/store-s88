@@ -1,0 +1,25 @@
+{
+  "api_domain": "https://raw.githubusercontent.com/Vulcan-dev-25/configs/main/apps/api_test.json?",
+  "env": "prod",
+  "rs_domain": "https://rs.static607zgn.com/",
+  "texts": {
+    "1107c3dc02c0": "Không mở được cửa hàng ứng dụng. Vui lòng thử lại.",
+    "1107c4dc02c0": "Cập nhật thành công",
+    "1107c5dc02c0": "Đã tải và cập nhật version mới (v{version}) thành công.\n\nOK: khởi động lại ứng dụng để chạy version mới ngay.\nCancel: tiếp tục phiên hiện tại — version mới sẽ tự áp dụng ở lần mở app sau.",
+    "1107c6dc02c0": "Đã tải và cập nhật version mới (v{version}) thành công.\n\nOK: tắt ứng dụng — mở lại để chạy version mới ngay.\nCancel: tiếp tục phiên hiện tại — version mới sẽ tự áp dụng ở lần mở app sau.",
+    "1107c7dc02c0": "Không khởi động lại được (code={code}).",
+    "1107c8dc02c0": "OK",
+    "1107c9dc02c0": "Cancel",
+    "1107cadc02c0": "Ready",
+    "e310e17aea3b": "Để sau",
+    "e310e27aea3b": "Cập nhật",
+    "e310e97aea3b": "Lỗi Internet",
+    "e310ea7aea3b": "Loading...",
+    "e310eb7aea3b": "Thử lại",
+    "e310ec7aea3b": "Không thể kết nối đến server. Thử lại?",
+    "e310ed7aea3b": "Đã có bản cập nhật mới. Vui lòng cập nhật để tiếp tục sử dụng.",
+    "e310ee7aea3b": "Cập nhật mới",
+    "e310ef7aea3b": "Đã có bản cập nhật mới với nhiều cải tiến. Bạn có muốn cập nhật ngay?",
+    "e310f07aea3b": "Cập nhật ngay"
+  }
+}

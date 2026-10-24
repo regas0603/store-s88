@@ -11,6 +11,12 @@
     "last_version_code": 2,
     "status": "active"
   },
+  "com.hitamole.game": {
+    "force_vc": {},
+    "ios_app_id": null,
+    "last_version_code": 3,
+    "status": "active"
+  },
   "com.numberguess.app": {
     "force_vc": {},
     "ios_app_id": null,
