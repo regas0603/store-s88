@@ -12,6 +12,8 @@
 # Bước nào ĐÃ XONG thì SKIP — chạy lại vô hại (kể cả sau khi reset máy).
 #
 # Làm gì (thứ tự có phụ thuộc):
+#   00. Quarantine : gỡ com.apple.quarantine (engine, pub-cache…) TRƯỚC mọi bước
+#                    → Gatekeeper không bắt "Allow" từng binary trong Privacy & Security
 #   0. Tự cài SDK    : thiếu cái nào (trừ Xcode) thì tự cài qua brew
 #                      (brew itself, git, node>=20, python3, CocoaPods,
 #                      Android cmdline-tools + licenses, Metal Toolchain);
@@ -99,6 +101,17 @@ engine_ok() {
   # stamp (dynmod.sh ghi lúc build) phải == commit của configs/flutter.json
   [ -n "$WANT" ] && [ "$(bash "$FV" --stamp "$OUT/$(engine_od "$1")" 2>/dev/null)" = "$WANT" ]
 }
+
+# ── 00. Gỡ quarantine ───────────────────────────────────────────────────────
+# ĐẦU TIÊN, trước mọi bước chạy binary: engine / pub-cache chép qua AirDrop, zip…
+# mang cờ quarantine → Gatekeeper hỏi "Allow" từng binary (setup lẫn lúc build).
+step "00. Gỡ quarantine (Gatekeeper — Privacy & Security)"
+if [ "$DRY_RUN" = 1 ]; then
+  bash "$ROOT/tools/cmd/unquarantine.sh" --check || warn "còn file quarantine — chạy thật sẽ gỡ"
+else
+  bash "$ROOT/tools/cmd/unquarantine.sh" && pass "không còn file quarantine" \
+    || warn "gỡ quarantine lỗi — chạy tay: bash tools/cmd/unquarantine.sh"
+fi
 
 # ── 0. Tự cài SDK thiếu (trừ Xcode) ─────────────────────────────────────────
 step "0. Tự cài SDK thiếu (brew — trừ Xcode)"
