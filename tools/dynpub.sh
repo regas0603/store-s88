@@ -386,6 +386,26 @@ build_apk() {
   info "APK: $FILE ($(stat -f%z "$FILE") bytes)"
 }
 
+# rive_native tải lib native iOS 1 lần / pub-cache (đánh dấu bằng marker). Script
+# trong podspec của nó tự chạy setup nhưng với cwd = ios/Pods (không có
+# pubspec.yaml) → archive fail trên máy chưa setup. Chạy trước từ app/.
+rive_setup_ios() {
+  local FF="$1" dir
+  dir="$(python3 -c '
+import json, sys
+from urllib.parse import unquote, urlparse
+for p in json.load(open(sys.argv[1]))["packages"]:
+    if p["name"] == "rive_native":
+        print(unquote(urlparse(p["rootUri"]).path))
+' "$ROOT/app/.dart_tool/package_config.json" 2>/dev/null)" || return 0
+  [ -n "$dir" ] || return 0
+  [ -f "$dir/ios/rive_marker_ios_setup_complete" ] && return 0
+  info "rive_native chưa setup iOS trên máy này → dart run rive_native:setup…"
+  (cd "$ROOT/app" && "$FF/bin/dart" run rive_native:setup --verbose --platform ios) \
+    || die "rive_native setup iOS thất bại"
+  lock_verify
+}
+
 # IPA iOS: $1=debug|profile|adhoc|appstore $2=version $3=export plist (adhoc/appstore) → set $FILE
 #   debug/profile : engine stock → module fail-open (dev/test flow).
 #   adhoc/appstore: engine ddm (ios_release) + dynamic-interface → module OTA.
@@ -435,6 +455,7 @@ build_ipa() {
       ) ;;
   esac
 
+  rive_setup_ios "$FF"
   info "build ipa mode=${mode}…"
   (cd "$ROOT/app" && "$FF/bin/flutter" build ipa "${mode_args[@]}" \
     ${export_args[@]+"${export_args[@]}"} \
