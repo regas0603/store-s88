@@ -103,11 +103,38 @@ class WebProbe:
         return hit
 
 
+def web_branch_only(d):
+    """File trong lib/ mà package chỉ trỏ tới qua nhánh web của import/export
+    điều kiện (vd spine_flutter: `'init.dart' if (dart.library.html)
+    'init_web.dart'`) — trên VM không ai nạp, và thường không biên dịch được
+    (kiểu web_ffi_fork lệch dart:ffi) dù không import thẳng dart:html."""
+    web, vm = set(), set()
+    for root, _, files in os.walk(d):
+        for f in files:
+            if not f.endswith(".dart"):
+                continue
+            p = os.path.join(root, f)
+            src = open(p, encoding="utf-8", errors="replace").read()
+            for m in DIRECTIVE.finditer(src):
+                directive = m.group(1)
+                conds = re.findall(r"if\s*\(\s*([\w.]+)\s*\)\s*'([^']+)'", directive)
+                if not conds:
+                    continue
+                v = vm_uri(directive)
+                for uri in [u for _, u in conds] + re.findall(r"'([^']+)'", directive)[:1]:
+                    if uri.startswith("dart:") or uri.startswith("package:"):
+                        continue
+                    t = os.path.normpath(os.path.join(root, uri))
+                    (vm if uri == v else web).add(t)
+    return web - vm
+
+
 def public_libs(pkg, roots, probe):
     """lib/*.dart không phải part, không chạm web trên nhánh VM."""
     d = roots.get(pkg)
     if not d or not os.path.isdir(d):
         return [], []
+    web_only = web_branch_only(d)
     keep, skipped = [], []
     for f in sorted(os.listdir(d)):
         p = os.path.join(d, f)
@@ -116,7 +143,7 @@ def public_libs(pkg, roots, probe):
         head = open(p, encoding="utf-8", errors="replace").read(4096)
         if re.search(r"^\s*part\s+of\b", head, re.M):
             continue
-        if probe.touches_web(p):
+        if os.path.normpath(p) in web_only or probe.touches_web(p):
             skipped.append("package:%s/%s" % (pkg, f))
             continue
         keep.append("package:%s/%s" % (pkg, f))

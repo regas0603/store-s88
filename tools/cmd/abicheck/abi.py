@@ -494,22 +494,48 @@ def cmd_app_package(pkg_dir, accept):
     # Đổi so với lần chấp nhận trước (AI tự nâng version…).
     if os.path.isfile(DEPS_FILE) and not accept:
         old = json.load(open(DEPS_FILE))
-        changes = []
+        # Tầng theo luật: package host chưa có nhưng luật bắt nằm ở host (plugin
+        # native, FFI…) → không phải "module tự mang", không được tự ghi mốc.
+        try:
+            rule_tier = cp.classify()[2]
+        except Exception:
+            rule_tier = {}
+        changes, host_new = [], False
         for rel in sorted(set(old) | set(current)):
             a, b = old.get(rel, {}), current.get(rel, {})
             for dep in sorted(set(a) | set(b)):
                 if a.get(dep) != b.get(dep):
-                    tag = "host" if dep in frozen else "module"
-                    changes.append(f"{rel}: {dep} {a.get(dep, '(chưa có)')} → {b.get(dep, '(bỏ)')}  [{tag}]")
-        if changes:
-            # FAIL (exit 2, khác vi phạm ABI = exit 1): đổi ràng buộc package host
-            # chưa được nhận = có thể đổi ABI host → phải duyệt qua dynpub [11].
+                    # Cột trái/phải là ràng buộc trong pubspec app_package (mốc cũ → nay),
+                    # KHÔNG phải trạng thái host; tag nói host có package hay không.
+                    t = rule_tier.get(dep)
+                    if dep in frozen:
+                        tag = f"host đã có {frozen[dep]}"
+                    elif t in cp.RANK and cp.RANK[t] >= 1 and dep in b:
+                        tag = f"host CHƯA có, luật bắt ở host ({t}) — CẦN BUILD LẠI HOST"
+                        host_new = True
+                    else:
+                        tag = "module tự mang — host KHÔNG có"
+                    changes.append(f"{rel}: {dep} {a.get(dep, '(mới khai báo)')} → "
+                                   f"{b.get(dep, '(bỏ khai báo)')}  [{tag}]")
+        if changes and not errs and not host_new:
+            # Mọi ràng buộc vẫn thoả version host đóng băng (errs == 0) → pub get
+            # host giữ nguyên lock, ABI không đổi → tự ghi mốc, không bắt duyệt.
+            # Package host MỚI (plugin native…) do classify_packages check chặn.
+            print(f"  [i]    {len(changes)} ràng buộc version trong pubspec app_package ĐỔI so với mốc "
+                  f"— đều thoả host đóng băng (ABI không đổi) → tự ghi mốc:")
+            for c in changes:
+                print("         " + c)
+            accept = True
+        elif changes:
+            # FAIL (exit 2, khác vi phạm ABI = exit 1): còn ràng buộc vi phạm ở
+            # trên → không tự ghi mốc; sửa ràng buộc hoặc nhận ABI mới ở dynpub [11].
             drift = True
-            bad(f"{len(changes)} ràng buộc version ĐỔI so với mốc đã chấp nhận "
+            bad(f"{len(changes)} ràng buộc version trong pubspec app_package ĐỔI so với mốc đã chấp nhận "
                  f"({os.path.relpath(DEPS_FILE, ROOT)}):")
             for c in changes:
                 print("         " + c)
-            print("         → xem lại; đúng ý thì: bash tools/dynpub.sh → [11] (nhận đổi package host)")
+            print("         → sửa ràng buộc vi phạm / bỏ package CẦN BUILD LẠI HOST; "
+                  "cố ý đổi host: bash tools/dynpub.sh → [11] → [2] (ABI host mới)")
         else:
             ok("ràng buộc version không đổi so với mốc đã chấp nhận")
     if accept or not os.path.isfile(DEPS_FILE):

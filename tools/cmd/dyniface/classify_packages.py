@@ -409,9 +409,12 @@ def cmd_check():
             if n in where:
                 errs.append("%s nằm ở 2 tầng: %s, %s" % (n, where[n], t))
             where[n] = t
+    # Package mới chưa ghi manifest, tách 2 loại: tầng host (sdk/t0/t1) = host
+    # phải mang → BUILD LẠI HOST; tầng module/excluded = chỉ thiếu sổ sách.
+    new_host, new_module = [], []
     for n in tier:
         if n not in where:
-            errs.append("%s (%s theo luật) chưa có trong manifest" % (n, tier[n]))
+            (new_host if RANK[tier[n]] >= 1 else new_module).append(n)
     for n, t in where.items():
         if n not in tier:
             errs.append("%s có trong manifest nhưng không còn trong package_config" % n)
@@ -430,11 +433,22 @@ def cmd_check():
             td = where.get(d)
             if td and td != "excluded" and rank[td] < 1:
                 errs.append("%s (%s) phụ thuộc %s (%s) — host không được phụ thuộc module" % (n, t, d, td))
-    if errs:
-        print("== check host_packages.yaml: %d lỗi ==" % len(errs))
+    if errs or new_host or new_module:
+        print("== check host_packages.yaml: %d lỗi ==" % (len(errs) + len(new_host) + len(new_module)))
         for e in errs:
             print("  \033[31m[FAIL]\033[0m " + e)
-        return 1
+        if new_host:
+            print("  \033[31m[FAIL]\033[0m %d package MỚI ở tầng host — CẦN BUILD LẠI HOST (đổi ABI):" % len(new_host))
+            for n in sorted(new_host):
+                print("           %-28s %-20s %s" % (n, tier[n], why.get(n, "")))
+            print("           → bỏ package kéo chúng vào; hoặc nhận: bash tools/dynpub.sh → [11] → [2] Nhận ABI host mới → [5] build lại app")
+        if new_module:
+            print("  \033[33m[FAIL]\033[0m %d package mới ở tầng module — KHÔNG đổi host, chỉ cần ghi manifest:" % len(new_module))
+            for n in sorted(new_module):
+                print("           %-28s %s" % (n, tier[n]))
+            print("           → bash tools/dynpub.sh → [11] → [1] Chỉ sửa manifest (tự ghi host_packages.yaml + commit)")
+        # 2 = chỉ thiếu sổ sách tầng module (dynpub [11] tự sửa); 1 = phần còn lại.
+        return 1 if errs or new_host else 2
     if MAIN_ONLY:
         print("  [i]    bỏ qua %d package riêng của main_app hiện tại (abicheck main-app kiểm): %s"
               % (len(MAIN_ONLY), ", ".join(sorted(MAIN_ONLY))))

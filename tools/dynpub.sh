@@ -28,7 +28,9 @@
 #   ── Ít dùng
 #   [9] Quản lý app                    thêm app (chọn env) / đổi env / đánh dấu app chết / Apple ID
 #   [10] Kiểm link store / app thay thế (cron)
-#   [11] Đổi package host (ABI)        app_package đòi version package host khác → pub get → xác nhận → chụp mốc + commit lock
+#   [11] Đổi package host (ABI)        app_package đòi version / package host mới → pub get → xác nhận → chụp mốc + commit lock
+#        [1] Chỉ sửa manifest / mốc ràng buộc   host KHÔNG đổi (package nội bộ module mới, nới ràng buộc)
+#        [2] Nhận ABI host mới                 package host mới / đổi version → [5] build lại app
 #   [12] Đổi rs_domain của env         ghi lại config mọi app của env đó rồi deploy
 #   [13] Đổi api_domain của env        ghi api_domain của env vào deploy.json + mọi config app của env đó
 #   ── Dev
@@ -635,6 +637,17 @@ menu_build() {
   build_host "$BUNDLE" "$PLATFORM" "$ver" "$m" "$UNLOCK_DATE"
 }
 
+# modprep tự ghi sổ sách khi host không đổi (mốc ràng buộc / package tầng
+# module mới) → commit luôn để lần sau không báo lại.
+commit_bookkeeping() {
+  local files=(configs/abi/app_package_deps.json configs/abi/host_packages.yaml)
+  git -C "$ROOT" diff --quiet -- "${files[@]}" && return 0
+  (cd "$ROOT" && git add -- "${files[@]}" \
+     && git commit -q -m "dynpub: tự ghi sổ sách app_package (host không đổi)" -- "${files[@]}") \
+    && info "đã commit sổ sách app_package (host không đổi): ${files[*]}" \
+    || info "commit sổ sách app_package thất bại — commit tay: ${files[*]}"
+}
+
 # Patch luôn compile với host THAM CHIẾU (apps/_reference/main_app) để kết quả không phụ
 # thuộc app nào vừa build trước đó (main_app khác có thể kéo version package
 # host khác → requires lệch).
@@ -642,7 +655,8 @@ do_patch() {
   local mfu="${1:-0}" envs="${2:-}"
   echo
   echo "\$ bash tools/cmd/modprep.sh apply"
-  bash "$T/modprep.sh" apply || die "modprep apply thất bại — xử lý [FAIL] ở trên rồi chạy lại (FAIL vì app_package đòi version package host khác → menu [11])"
+  bash "$T/modprep.sh" apply || die "modprep apply thất bại — xử lý [FAIL] ở trên rồi chạy lại (FAIL ràng buộc version / package host mới → menu [11] → [2])"
+  commit_bookkeeping
   check_flutter
   info "host tham chiếu: xuất apps/_reference/main_app + pub get + build lại anchor/interface…"
   lock_reset
@@ -668,42 +682,80 @@ menu_patch() {
   after_write "patch"
 }
 
-# app_package (s88) đòi version package host khác (vd shared_preferences ^2.5.6):
-# [1] dừng ở modprep check, [5] dừng ở lock_verify. Option này nhận version mới
-# làm mốc host: pub get → lock đổi → xác nhận → anchor/iface → chụp mốc → commit.
-# Sau đó [5] build lại app (ABI mới) → [1] ra patch.
+# app_package đổi package (vd shared_preferences ^2.5.6, thêm package nội bộ,
+# thêm plugin native): [1] dừng ở modprep check, [5] dừng ở lock_verify.
+# Option này có 2 lựa chọn:
+#   [1] Chỉ sửa manifest / mốc ràng buộc — host KHÔNG đổi (package nội bộ
+#       module mới, nới ràng buộc mà host cũ vẫn thoả). Phát hiện thay đổi ở
+#       tầng host thì từ chối.
+#   [2] Nhận ABI host mới — pub get → lock đổi → xác nhận → anchor/iface →
+#       chụp mốc → commit. Sau đó [5] build lại app (ABI mới) → [1] ra patch.
 menu_host_pkg() {
+  choose "Đổi package host — làm gì?" \
+    "Chỉ sửa manifest / mốc ràng buộc (host KHÔNG đổi, không build lại host)" \
+    "Nhận ABI host mới (package host mới / đổi version → phải [5] build lại app)"
+  local mode="$CHOICE"
   check_flutter
   lock_reset
   echo
   echo "\$ bash tools/cmd/modprep.sh apply   (FAIL ràng buộc version ở đây là bình thường)"
   bash "$T/modprep.sh" apply || true
+  commit_bookkeeping
   info "host tham chiếu + pub get theo ràng buộc mới của app_package…"
   bash "$T/build_main_app.sh" --no-verify || die "xuất apps/_reference/main_app thất bại"
   bash "$T/dynmod.sh" pubget || die "pub get host thất bại"
   echo
-  if python3 -B "$T/lockcheck.py"; then
-    # Lock không đổi nhưng ràng buộc app_package có thể đổi mà host cũ vẫn
-    # thoả (vd ^2.2.0 → ^2.5.0, host 2.5.5) → chỉ cần nhận mốc ràng buộc.
+  # Phân tầng package: 2 = chỉ thiếu package tầng module trong manifest (sổ
+  # sách, host không đổi); 1 = có package MỚI tầng host (vd plugin native) —
+  # lockcheck vẫn PASS vì lock chỉ THÊM package, nên phải xét riêng.
+  local crc=0 cout host_change=0
+  cout="$(python3 -B "$T/dyniface/classify_packages.py" check 2>&1)" || crc=$?
+  python3 -B "$T/lockcheck.py" || host_change=1
+  [ "$crc" = 1 ] && host_change=1
+  if [ "$mode" = 1 ]; then
+    if [ "$host_change" = 1 ]; then
+      [ "$crc" = 1 ] && echo "$cout"
+      git -C "$ROOT" checkout -- app/pubspec.lock
+      bash "$T/dynmod.sh" pubget >/dev/null || true
+      die "có thay đổi ở tầng HOST (xem ở trên) — sửa manifest thôi là không đủ: bỏ package kéo chúng vào, hoặc chạy lại [11] → [2] Nhận ABI host mới"
+    fi
+    # Host không đổi; ràng buộc app_package có thể đổi mà host cũ vẫn thoả
+    # (vd ^2.2.0 → ^2.5.0, host 2.5.5) và/hoặc thêm package nội bộ module
+    # → chỉ cần ghi lại sổ sách.
     local out
     # exit 2 = chỉ ràng buộc đổi so với mốc (đúng việc option này nhận); 1 = vi phạm ABI.
-    local rc=0
+    local rc=0 drift=0
     out="$(bash "$T/abicheck.sh" app-package 2>&1)" || rc=$?
     [ "$rc" = 1 ] && { echo "$out"; die "app_package còn vi phạm ABI host — xem [FAIL] ở trên"; }
-    if ! grep -q "ĐỔI so với mốc" <<<"$out"; then
-      info "không package host nào đổi version, ràng buộc không đổi — không có gì để nhận"
+    grep -q "ĐỔI so với mốc" <<<"$out" && drift=1
+    if [ "$drift" = 0 ] && [ "$crc" = 0 ]; then
+      info "không package host nào đổi, ràng buộc / phân tầng không đổi — không có gì để nhận"
       return 0
     fi
-    echo "$out"
-    info "host không đổi version (ABI giữ nguyên) — chỉ ghi lại mốc ràng buộc"
-    yes_no "Nhận ràng buộc mới làm mốc?" Y || { info "huỷ"; return 0; }
-    bash "$T/abicheck.sh" app-package --accept >/dev/null || die "ghi mốc ràng buộc thất bại"
-    (cd "$ROOT" && git add configs/abi/app_package_deps.json \
-       && git commit -q -m "dynpub: nhận mốc ràng buộc app_package" -- configs/abi/app_package_deps.json \
-       && info "đã commit: dynpub: nhận mốc ràng buộc app_package")
+    [ "$drift" = 1 ] && echo "$out"
+    [ "$crc" = 2 ] && echo "$cout"
+    info "host KHÔNG đổi (ABI giữ nguyên, không build lại host) — chỉ ghi lại sổ sách"
+    yes_no "Nhận làm mốc?" Y || { info "huỷ"; return 0; }
+    local files=()
+    if [ "$drift" = 1 ]; then
+      bash "$T/abicheck.sh" app-package --accept >/dev/null || die "ghi mốc ràng buộc thất bại"
+      files+=(configs/abi/app_package_deps.json)
+    fi
+    if [ "$crc" = 2 ]; then
+      bash "$T/dyniface.sh" packages --write >/dev/null || die "cập nhật host_packages.yaml thất bại"
+      files+=(configs/abi/host_packages.yaml)
+    fi
+    (cd "$ROOT" && git add "${files[@]}" \
+       && git commit -q -m "dynpub: nhận mốc app_package (host không đổi)" -- "${files[@]}" \
+       && info "đã commit: dynpub: nhận mốc app_package (${files[*]})")
     return 0
   fi
   echo
+  if [ "$host_change" = 0 ]; then
+    info "không phát hiện thay đổi ở tầng host (lock không đổi version, không có package host mới)"
+    yes_no "Vẫn chụp lại mốc ABI host?" N || { info "huỷ — chỉ cần sửa sổ sách thì chọn [11] → [1]"; return 0; }
+  fi
+  [ "$crc" = 1 ] && echo "$cout"
   info "nhận = ĐỔI ABI host: bản build cũ dừng ở patch hiện tại; patch mới chỉ chạy trên bản build lại"
   if ! yes_no "Nhận version mới ở trên làm mốc host?" N; then
     git -C "$ROOT" checkout -- app/pubspec.lock
@@ -715,10 +767,12 @@ menu_host_pkg() {
   bash "$T/dyniface.sh" packages --write || die "cập nhật host_packages.yaml thất bại"
   bash "$T/dyniface.sh" bootstrap || die "build anchor/interface thất bại"
   bash "$ROOT/tools/snapshot.sh" -y || die "chụp mốc thất bại — xem [FAIL] ở trên (lock CHƯA commit)"
-  (cd "$ROOT" && git add app/pubspec.lock configs/abi/module_abi.json configs/abi/app_package_deps.json configs/abi/host_packages.yaml \
-     && git commit -q -m "dynpub: đổi package host (ABI mới)" \
-       -- app/pubspec.lock configs/abi/module_abi.json configs/abi/app_package_deps.json \
-     && info "đã commit: dynpub: đổi package host (ABI mới)")
+  local abi_files=(app/pubspec.lock configs/abi/module_abi.json configs/abi/app_package_deps.json
+                   configs/abi/host_packages.yaml app/lib/shell/host_packages.g.dart)
+  (cd "$ROOT" && git add "${abi_files[@]}" \
+     && git commit -q -m "dynpub: đổi package host (ABI mới)" -- "${abi_files[@]}" \
+     && info "đã commit: dynpub: đổi package host (ABI mới)") \
+    || info "không có file ABI nào đổi — không commit"
   echo
   info "tiếp: [5] build lại các app còn cập nhật → [6] live → [1] ra patch → deploy"
   info "máy chạy bản build cũ dừng ở patch hiện tại (ép lên store: [8] → Cấm patch cũ)"

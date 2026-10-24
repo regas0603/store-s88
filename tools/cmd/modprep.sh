@@ -86,7 +86,19 @@ for p in pc["packages"]:
       info "chưa có configs/abi/module_abi.json — bỏ qua kiểm version (dynpub release sẽ chụp)"
     fi
     if [ "$packages" = 1 ]; then
-      python3 "$ROOT/tools/cmd/dyniface/classify_packages.py" check || FAILS=$((FAILS+1))
+      # exit 2 = chỉ thiếu package tầng module trong manifest (host không đổi)
+      # → tự ghi; exit 1 = package host MỚI / lệch tầng → FAIL (dynpub [11]).
+      local crc=0
+      python3 "$ROOT/tools/cmd/dyniface/classify_packages.py" check || crc=$?
+      if [ "$crc" = 2 ]; then
+        if python3 "$ROOT/tools/cmd/dyniface/classify_packages.py" --write >/dev/null; then
+          info "đã tự ghi package tầng module vào configs/abi/host_packages.yaml (host không đổi)"
+        else
+          bad "tự ghi configs/abi/host_packages.yaml thất bại"
+        fi
+      elif [ "$crc" != 0 ]; then
+        FAILS=$((FAILS+1))
+      fi
     fi
   fi
 
