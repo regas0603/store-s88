@@ -29,7 +29,7 @@ class BootShell extends StatefulWidget {
     this.title = '',
     this.theme,
     this.ownRootMaterialApp = false,
-    this.initialFlowDelay = const Duration(seconds: 2),
+    this.initialFlowDelay = Duration.zero,
   });
 
   /// Màn hình chế độ CHÍNH ([AppMode.live]) — vế `trueScreenBuilder` của

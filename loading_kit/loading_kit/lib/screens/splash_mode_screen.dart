@@ -21,7 +21,7 @@ class SplashModeScreen extends StatefulWidget {
     required this.launchCoordinator,
     this.splashScreenBuilder,
     this.onModeChanged,
-    this.initialFlowDelay = const Duration(seconds: 2),
+    this.initialFlowDelay = Duration.zero,
     this.showStepDots = true,
     this.animateStepDots = true,
     this.showStepDotsDebugLabel = false,

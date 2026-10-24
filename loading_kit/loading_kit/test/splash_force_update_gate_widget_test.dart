@@ -56,7 +56,7 @@ void main() {
     );
   }
 
-  /// initial delay 2s + fast-path fetch fail.
+  /// fast-path fetch fail.
   Future<void> pumpThroughBootFlow(WidgetTester tester) async {
     await tester.pump(const Duration(seconds: 2, milliseconds: 100));
     await tester.pump(const Duration(seconds: 30));
