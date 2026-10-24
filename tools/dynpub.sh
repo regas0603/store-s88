@@ -389,6 +389,9 @@ build_apk() {
 # IPA iOS: $1=debug|profile|adhoc|appstore $2=version $3=export plist (adhoc/appstore) → set $FILE
 #   debug/profile : engine stock → module fail-open (dev/test flow).
 #   adhoc/appstore: engine ddm (ios_release) + dynamic-interface → module OTA.
+#   appstore ký Automatic (không có profile Development trên máy): archive Automatic
+#   luôn ký Development → Apple đòi team có device → chỉ archive KHÔNG ký
+#   ($FILE = .xcarchive), người dùng tự Distribute trong Xcode Organizer.
 build_ipa() {
   local mode="$1" ver="$2" plist="${3:-}"
   local FF IFACE
@@ -396,6 +399,10 @@ build_ipa() {
   split_version "$ver"
   local -a mode_args engine_args=()
   local -a export_args=()
+  local archive_only=0
+  if [ "$mode" = appstore ] && grep -q '^APP_SIGN_STYLE = Automatic' "$XCCONFIG_OUT" 2>/dev/null; then
+    archive_only=1
+  fi
   case "$mode" in
     debug)   mode_args=(--debug --export-method development --dart-define=DYNMOD_ENABLE=false) ;;
     profile) mode_args=(--profile --export-method development --dart-define=DYNMOD_ENABLE=false) ;;
@@ -404,7 +411,11 @@ build_ipa() {
     adhoc|appstore)
       mode_args=(--release --dart-define=DYNMOD_ENABLE=true)
       [ -f "$plist" ] || die "thiếu export options plist cho $mode"
-      export_args=(--export-options-plist="$plist") ;;
+      if [ "$archive_only" = 1 ]; then
+        export_args=(--no-codesign)
+      else
+        export_args=(--export-options-plist="$plist")
+      fi ;;
     *) die "build_ipa mode lạ: $mode" ;;
   esac
   case "$mode" in
@@ -430,6 +441,12 @@ build_ipa() {
     --build-name="$VN_NAME" --build-number="$VN_NUM" \
     ${engine_args[@]+"${engine_args[@]}"}) \
     || die "build ipa thất bại (kiểm tra signing / profile trong apps/<bundle>/app.yaml)"
+  if [ "$archive_only" = 1 ]; then
+    FILE="$ROOT/app/build/ios/archive/Runner.xcarchive"
+    [ -d "$FILE" ] || die "không thấy $FILE"
+    info "không có profile Development trên máy → chỉ archive (chưa ký): $FILE"
+    return
+  fi
   FILE="$(ls -t "$ROOT"/app/build/ios/ipa/*.ipa 2>/dev/null | head -1)"
   [ -n "$FILE" ] || die "không thấy .ipa trong app/build/ios/ipa"
   info "IPA: $FILE ($(stat -f%z "$FILE") bytes)"
@@ -547,8 +564,13 @@ build_host() {
   local out="$ROOT/dist/builds"
   mkdir -p "$out"
   local dst="$out/${b}_${p}_${VN_NAME}+${VN_NUM}.${FILE##*.}"
-  cp -f "$FILE" "$dst"
+  rm -rf "$dst"
+  cp -R "$FILE" "$dst"
   info "bản build: $dst"
+  if [ "${FILE##*.}" = xcarchive ]; then
+    open "$dst" || true
+    info "đã mở archive trong Xcode Organizer → Distribute App → App Store Connect (Xcode ký Automatic bằng tài khoản đã đăng nhập)"
+  fi
   if [ -n "$reg_mode" ]; then
     reg register-host --bundle "$b" --platform "$p" --version-name "$VN_NAME" \
       --version-code "$VN_NUM" --mode "$reg_mode" --unlock-date "$unlock" \
