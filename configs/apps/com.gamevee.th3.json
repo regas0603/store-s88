@@ -1,7 +1,7 @@
 {
   "api_domain": "https://raw.githubusercontent.com/Vulcan-dev-25/configs/main/apps/api_test.json?",
-  "env": "staging",
-  "rs_domain": "https://common-s88.sandboxg1.win/",
+  "env": "pre",
+  "rs_domain": "https://rs.static607zgn.com/pre/",
   "soft_prompt_interval_hours": 24,
   "texts": {
     "a63951676b68": "Không mở được cửa hàng ứng dụng. Vui lòng thử lại.",
