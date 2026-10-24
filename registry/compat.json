@@ -25,6 +25,13 @@
           "reason": "logger: host 2.6.2 ≠ patch 2.8.0; shared_preferences: host 2.5.6 ≠ patch 2.5.5"
         },
         "max_patch": 0
+      },
+      "e59d31a36fc87693": {
+        "first_break": {
+          "patch": 1,
+          "reason": "logger: host 2.6.2 ≠ patch 2.8.0; shared_preferences: host 2.5.6 ≠ patch 2.5.5"
+        },
+        "max_patch": 0
       }
     },
     "latest": 1
@@ -44,6 +51,10 @@
         "max_patch": 0
       },
       "9020d32f311b99da": {
+        "first_break": null,
+        "max_patch": 0
+      },
+      "e59d31a36fc87693": {
         "first_break": null,
         "max_patch": 0
       }
@@ -74,6 +85,10 @@
         "max_patch": 0
       },
       "9020d32f311b99da": {
+        "first_break": null,
+        "max_patch": 4
+      },
+      "e59d31a36fc87693": {
         "first_break": null,
         "max_patch": 4
       }
