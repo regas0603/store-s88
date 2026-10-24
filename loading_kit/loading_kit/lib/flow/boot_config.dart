@@ -31,7 +31,7 @@ abstract final class BootConfig {
   ///
   /// Do `tools/dynpub.sh` ghi mỗi lần build host — giữ đúng dạng
   /// `DateTime(y, m, d)` trên 1 dòng.
-  static final DateTime appReleaseDate = DateTime(2026, 10, 18);
+  static final DateTime appReleaseDate = DateTime(2026, 10, 27);
 
   /// Non-empty string from [json], else null.
   static String? readString(Map<String, dynamic> json, String key) {
