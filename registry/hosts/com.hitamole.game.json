@@ -19,6 +19,16 @@
       "unlock_date": "2026-10-27",
       "version_code": 10,
       "version_name": "1.0.10"
+    },
+    {
+      "abi_id": "9020d32f311b99da",
+      "built_at": "2026-10-24T12:44:03Z",
+      "git_rev": "49a354b",
+      "mode": "appstore",
+      "platform": "ios",
+      "unlock_date": "2026-10-27",
+      "version_code": 11,
+      "version_name": "1.0.11"
     }
   ],
   "bundle_id": "com.hitamole.game"
