@@ -57,7 +57,9 @@ tiers:
     - http                                         # 1.6.0 — code host (app/loading_kit/…) import
     - http_parser                                  # 4.1.2 — dep bắc cầu của dio
     - image                                        # 4.10.1 — dep bắc cầu của clarity_flutter
+    - inject_js                                    # 2.1.0 — dep bắc cầu của spine_flutter
     - jni                                          # 0.14.2 — plugin: Dart phải khớp version native trong host
+    - js                                           # 0.6.7 — dep bắc cầu của web_ffi_fork
     - json_annotation                              # 4.12.0 — dep bắc cầu của clarity_flutter
     - loading_kit                                  # 0.1.0 — code host (app/loading_kit/…) import
     - main_app_package                             # 1.0.0 — code host (app/loading_kit/…) import
@@ -93,6 +95,7 @@ tiers:
     - shared_preferences_foundation                # 2.5.7 — plugin: Dart phải khớp version native trong host
     - shared_preferences_platform_interface        # 2.4.2 — platform_interface của plugin
     - source_span                                  # 1.10.2 — dep bắc cầu của http_parser
+    - spine_flutter                                # 4.2.36 — plugin: Dart phải khớp version native trong host
     - sqflite                                      # 2.4.4 — plugin: Dart phải khớp version native trong host
     - sqflite_android                              # 2.4.4 — plugin: Dart phải khớp version native trong host
     - sqflite_common                               # 2.5.13 — dep bắc cầu của sqflite
@@ -117,6 +120,7 @@ tiers:
     - video_player_platform_interface              # 6.9.0 — platform_interface của plugin
     - wakelock_plus                                # 1.5.2 — plugin: Dart phải khớp version native trong host
     - wakelock_plus_platform_interface             # 1.7.0 — platform_interface của plugin
+    - web_ffi_fork                                 # 0.7.5 — dep bắc cầu của spine_flutter
     - webview_flutter                              # 4.14.1 — plugin: Dart phải khớp version native trong host
     - webview_flutter_android                      # 4.14.1 — plugin: Dart phải khớp version native trong host
     - webview_flutter_platform_interface           # 2.15.1 — platform_interface của plugin
@@ -175,11 +179,12 @@ tiers:
     - brand_config                                 # 0.1.0 — code app_package
     - casino_jackpot                               # 0.1.0 — code app_package
     - chat_protocol                                # 0.1.0 — code app_package
+    - crypto_lottery_domain                        # 0.1.0 — code app_package
     - dart_kit                                     # 0.1.0 — code app_package
     - floating_draggable_widget                    # 2.3.0 — code app_package
     - flutter_slider_drawer                        # 3.0.2 — code app_package
     - fullscreen_guard                             # 0.1.0 — code app_package
-    - game_api_client                              # 0.1.0 — code app_package
+    - game_api_client                              # 0.3.0 — code app_package
     - game_downloader                              # 0.1.0 — code app_package
     - game_engine                                  # 0.1.0 — plugin nội bộ chỉ đăng ký native — Dart theo module, GIỮ giao thức channel
     - game_foundation                              # 0.1.0 — code app_package
@@ -187,6 +192,7 @@ tiers:
     - game_orientation                             # 0.1.0 — code app_package
     - game_taxonomy                                # 0.1.0 — code app_package
     - game_volta_core                              # 1.0.0 — code app_package
+    - game_volta_s_core                            # 0.1.0 — code app_package
     - lode                                         # 0.1.0+1 — code app_package
     - mini_game_countdown_core                     # 0.1.0 — code app_package
     - mini_game_protocol                           # 0.1.0 — code app_package
