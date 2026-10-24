@@ -254,6 +254,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.7"
+  crypto_lottery_domain:
+    dependency: transitive
+    description:
+      path: "../../app_package/packages/crypto_lottery_domain"
+      relative: true
+    source: path
+    version: "0.1.0"
   csslib:
     dependency: transitive
     description:
@@ -538,7 +545,7 @@ packages:
       path: "../../app_package/packages/game_api_client"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.3.0"
   game_downloader:
     dependency: transitive
     description:
@@ -588,6 +595,13 @@ packages:
       relative: true
     source: path
     version: "1.0.0"
+  game_volta_s_core:
+    dependency: transitive
+    description:
+      path: "../../app_package/packages/game_volta_s_core"
+      relative: true
+    source: path
+    version: "0.1.0"
   gap:
     dependency: transitive
     description:
@@ -684,6 +698,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.10.1"
+  inject_js:
+    dependency: transitive
+    description:
+      name: inject_js
+      sha256: "849eacfd4b7e9182a7e743843a820d74bf1abcb692bdbe09e34ef0f753ad7227"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   intl:
     dependency: transitive
     description:
@@ -708,6 +730,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.14.2"
+  js:
+    dependency: transitive
+    description:
+      name: js
+      sha256: f2c445dce49627136094980615a031419f7f3eb393237e4ecd97ac15dea343f3
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.7"
   json_annotation:
     dependency: transitive
     description:
@@ -1247,6 +1277,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.2"
+  spine_flutter:
+    dependency: transitive
+    description:
+      name: spine_flutter
+      sha256: "195dfd2936f6938cefb91862dab2b59ecd08d9fecf4c208d3ad5f72fe5e0715a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.36"
   sport_events:
     dependency: transitive
     description:
@@ -1563,6 +1601,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  web_ffi_fork:
+    dependency: transitive
+    description:
+      name: web_ffi_fork
+      sha256: "557b3008bb3c8547ee63eac6e53c0ebebb443da9d7558b3f1b98e1ed59989a11"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.5"
   web_socket:
     dependency: transitive
     description:

@@ -15,6 +15,9 @@
   "packages/chat_protocol/pubspec.yaml": {
     "clock": "^1.1.2"
   },
+  "packages/crypto_lottery_domain/pubspec.yaml": {
+    "dio": "^5.10.0"
+  },
   "packages/dart_kit/pubspec.yaml": {},
   "packages/floating_draggable_widget/pubspec.yaml": {},
   "packages/flutter_slider_drawer/pubspec.yaml": {},
@@ -51,6 +54,11 @@
   "packages/game_taxonomy/pubspec.yaml": {},
   "packages/game_volta_core/pubspec.yaml": {
     "crypto": "^3.0.0",
+    "meta": "^1.15.0",
+    "state_notifier": "^1.0.0",
+    "web_socket_channel": "^3.0.0"
+  },
+  "packages/game_volta_s_core/pubspec.yaml": {
     "meta": "^1.15.0",
     "state_notifier": "^1.0.0",
     "web_socket_channel": "^3.0.0"
@@ -119,7 +127,7 @@
     "intl": "^0.20.2",
     "isolate_manager": "^6.1.2",
     "json_annotation": "^4.9.0",
-    "logger": "2.6.2",
+    "logger": "^2.4.0",
     "lottie": "^3.3.2",
     "package_info_plus": "^9.0.1",
     "path_provider": "^2.1.0",
@@ -130,8 +138,9 @@
     "qr_flutter": "^4.1.0",
     "rive": "^0.14.9",
     "sentry_flutter": "^9.24.0",
-    "shared_preferences": "^2.5.6",
+    "shared_preferences": "^2.2.0",
     "shimmer_animation": "^2.1.0",
+    "spine_flutter": ">=4.2.36 <4.3.0",
     "styled_text": "^8.1.0",
     "url_launcher": "^6.2.5",
     "uuid": "^4.2.1",
