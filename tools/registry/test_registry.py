@@ -510,6 +510,16 @@ class CliTest(unittest.TestCase):
                          ("https://new-stg.example.com/", "/srv/new"))
         self.assertEqual(t["prod"]["rs_domain"], ENVS["prod"] + "/")
 
+        self.reg("set-api-domain", "staging", "https://api-new.example.com/?c=")
+        self.assertEqual(self.cfg("com.example.a")["api_domain"], "https://api-new.example.com/?c=")
+        # com.example.b đang ở env prod → không bị đụng khi đổi api_domain staging
+        # (api_domain đã có sẵn từ trước, _bundle_cfg_set không ghi đè key không rỗng)
+        self.assertEqual(self.cfg("com.example.b")["api_domain"], "https://api-from-github/?")
+        with open(R.DEPLOY_FILE) as f:
+            t = {x["name"]: x for x in json.load(f)["targets"]}
+        self.assertEqual(t["staging"]["api_domain"], "https://api-new.example.com/?c=")
+        self.assertEqual(t["prod"]["api_domain"], "https://api-prod.example.com/?c=")
+
         # chép config sang ../configs/apps: giữ key chỉ có bên kia (force_update),
         # không ghi rỗng, KHÔNG đụng git
         dst = os.path.join(R.CONFIGS_OUT, "com.example.a.json")

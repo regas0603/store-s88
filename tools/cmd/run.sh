@@ -165,7 +165,13 @@ bash "$ROOT/tools/cmd/build_main_app.sh" --src "$APP_MAIN_APP_SRC" --no-verify >
   || { echo "xuất main_app của $APP_ID thất bại"; exit 1; }
 XCCONFIG="$APP/ios/Flutter/AppIdentity.xcconfig"
 python3 -B "$IDPY" xcconfig "$APP_ID" "$XCCONFIG"
-trap 'rm -f "$XCCONFIG"' EXIT
+# Icon theo app.yaml: chép đè res/ + AppIcon.appiconset của app/ (backup trước),
+# trả icon gốc khi thoát. Cùng thư mục backup với dynpub → lỡ bị kill giữa
+# chừng thì lần mở dynpub sau tự khôi phục.
+ICON_BACKUP="$ROOT/.dynpub_icon_backup"
+python3 -B "$IDPY" icons-restore "$ICON_BACKUP" >/dev/null
+trap 'python3 -B "$IDPY" icons-restore "$ICON_BACKUP" >/dev/null 2>&1 || true; rm -f "$XCCONFIG"' EXIT
+python3 -B "$IDPY" icons-apply "$APP_ID" "$ICON_BACKUP"
 
 echo "▶ flutter run -d $DEV  (app=$APP_ID, APP_ENV=$APP_ENV)"
 cd "$APP"

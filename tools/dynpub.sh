@@ -30,6 +30,9 @@
 #   [10] Kiểm link store / app thay thế (cron)
 #   [11] Đổi package host (ABI)        app_package đòi version package host khác → pub get → xác nhận → chụp mốc + commit lock
 #   [12] Đổi rs_domain của env         ghi lại config mọi app của env đó rồi deploy
+#   [13] Đổi api_domain của env        ghi api_domain của env vào deploy.json + mọi config app của env đó
+#   ── Dev
+#   [14] Chạy thử app trên simulator   chọn app → tools/cmd/run.sh ios-sim (chưa bật simulator thì tự mở)
 #
 # Không tương tác (CI / cron):
 #   bash tools/dynpub.sh release --app <bundleId> --platform ios|android [--version 1.0.5+5] [--mode M] [--unlock D]
@@ -906,6 +909,65 @@ menu_rs_domain() {
   after_write "rs_domain $env → $new"
 }
 
+menu_api_domain() {
+  choose_env "Đổi api_domain của env nào?"
+  local env="$SEL_ENV" api l
+  api=$(python3 - "$ROOT" "$env" <<'PY'
+import json, os, sys
+root, env = sys.argv[1], sys.argv[2]
+cfg = json.load(open(os.path.join(root, "configs", "deploy.json")))
+for t in cfg.get("targets", []):
+    if t.get("name") == env:
+        print(t.get("api_domain") or "-")
+        break
+else:
+    print("-")
+PY
+)
+  echo
+  info "[$env] api_domain hiện tại: $api"
+  info "app của env: $(reg apps-in-env "$env" | tr '\n' ' ')"
+  ask "api_domain mới (vd https://api.example.com/?)"
+  local new="$REPLY"
+  echo
+  info "sẽ ghi configs/deploy.json + api_domain mọi config app env $env:"
+  yes_no "Đổi api_domain env $env → $new?" N || { info "huỷ"; return 0; }
+  reg set-api-domain "$env" "$new" || return 1
+  after_write "api_domain $env → $new"
+}
+
+# Chạy thử 1 app trên iOS simulator (debug, qua tools/cmd/run.sh — tự xuất
+# main_app, áp tên/bundle/icon, thoát thì trả icon gốc). Chưa simulator nào
+# bật → mở Simulator; nhiều máy đang bật → hỏi chọn.
+menu_run() {
+  pick_bundle 0
+  [ -f "$APPS_DIR/$BUNDLE/app.yaml" ] || die "apps/$BUNDLE/app.yaml chưa có — không chạy thử được"
+  local l; local -a udids=() labels=()
+  booted_sims() {
+    xcrun simctl list devices booted 2>/dev/null \
+      | sed -nE 's/^ +(.+) \(([0-9A-F-]{36})\) \(Booted\).*/\2\t\1/p'
+  }
+  read_lines booted_sims
+  if [ ${#LINES[@]} -eq 0 ]; then
+    info "chưa có simulator nào bật — mở Simulator…"
+    open -a Simulator
+    for _ in $(seq 60); do
+      read_lines booted_sims
+      [ ${#LINES[@]} -gt 0 ] && break
+      sleep 1
+    done
+    [ ${#LINES[@]} -gt 0 ] || die "Simulator chưa boot máy nào — mở 1 máy trong Simulator rồi chạy lại"
+  fi
+  for l in "${LINES[@]}"; do udids+=("${l%%$'\t'*}"); labels+=("${l#*$'\t'}"); done
+  if [ ${#udids[@]} -eq 1 ]; then
+    CHOICE=1
+  else
+    choose "Simulator:" "${labels[@]}"
+  fi
+  info "chạy $BUNDLE trên ${labels[$((CHOICE - 1))]}…"
+  DEVICE="${udids[$((CHOICE - 1))]}" APP_ID="$BUNDLE" bash "$T/run.sh" ios-sim
+}
+
 main_menu() {
   choose "Việc cần làm:" \
     "--Hằng ngày" \
@@ -923,7 +985,10 @@ main_menu() {
     "Quản lý app (thêm app / đánh dấu app chết / Apple ID / đổi env)" \
     "Kiểm link store / app thay thế" \
     "Nhận đổi version package host (đổi ABI)" \
-    "Đổi rs_domain của env"
+    "Đổi rs_domain của env" \
+    "Đổi api_domain của env" \
+    "--Dev" \
+    "Chạy thử app trên simulator"
   case "$CHOICE" in
     1) menu_patch ;;
     2) menu_deploy ;;
@@ -937,6 +1002,8 @@ main_menu() {
     10) reg check-links ;;
     11) menu_host_pkg ;;
     12) menu_rs_domain ;;
+    13) menu_api_domain ;;
+    14) menu_run ;;
   esac
 }
 

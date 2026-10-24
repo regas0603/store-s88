@@ -45,7 +45,8 @@ Lệnh (dynpub.sh wizard gọi; gọi tay khi cần):
                                           app chết / app bị ép mà không có bản cao hơn → mở app này
   set-env <bundle> <env>                 chuyển app sang env khác (config + manifest)
   set-rs-domain <env> <url> [--ssh-path P]  đổi rs_domain của env → mọi config env đó
-  sync-configs                            rs_domain mọi config = rs_domain env của nó
+  set-api-domain <env> <url>              đổi api_domain của env → mọi config env đó
+  sync-configs                            rs_domain mỗi config = rs_domain env của nó
   ios-app-id <bundle> <id>
   force-vc <bundle> <platform> <below_vc|0>
   block-below <N> --env E [--dry-run]
@@ -1813,6 +1814,26 @@ def main(argv):
         mark_changed(env)
         warn(f"deploy env {env} để đẩy manifest + bytecode lên domain mới TRƯỚC; deploy xong mới commit config mới "
              f"trong ../configs lên GitHub")
+    elif cmd == "set-api-domain":
+        env, url = a[0], a[1].strip()
+        need_env(env, envs)
+        if not re.match(r"^https?://[^/\\s]+", url):
+            raise RegError(f"api_domain không hợp lệ: {url}")
+        cfg = read_json(DEPLOY_FILE)
+        for t in cfg["targets"]:
+            if t.get("name") == env:
+                info(f"[{env}] api_domain {t.get('api_domain') or '-'} → {url}")
+                t["api_domain"] = url
+        _write_deploy_cfg(cfg)
+        envs = load_envs()
+        for b in apps_in_env(env):
+            c = read_app_cfg(b)
+            c["api_domain"] = url
+            write_json(app_cfg_path(b), c)
+            ok(f"configs/apps/{b}.json: api_domain → {url}")
+        mark_changed(env)
+        warn(f"api_domain env {env} → {url} (ghi configs/deploy.json + configs/apps/<app>.json của env này; "
+             f"bạn commit + push configs sau để app nhận config mới)")
     elif cmd == "sync-configs":
         for b, c in all_app_cfgs().items():
             e = c.get("env")

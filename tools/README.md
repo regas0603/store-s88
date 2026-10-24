@@ -36,6 +36,9 @@ Chỉ cần chạy `bash tools/dynpub.sh` rồi chọn số — không truyền 
 [10] Kiểm link store / app thay thế
 [11] Đổi package host (ABI)
 [12] Đổi rs_domain của env
+[13] Đổi api_domain của env
+── Dev
+[14] Chạy thử app trên simulator  chọn app → tools/cmd/run.sh ios-sim (tự mở Simulator, áp tên/icon của app)
 ```
 
 Mỗi bước ghi xong (trừ [5] Build host), wizard hỏi **deploy**; deploy xong thì **tự commit** registry/ + publish/ (deploy lỗi / hoãn → chưa commit, deploy xong ở [7] sẽ commit).
@@ -111,6 +114,8 @@ tool vẫn nhớ.
 ghi `deploy.json` + rs_domain mọi config app của env đó → deploy: file lên
 domain mới trước, chép config sang `../configs` sau → bạn commit + push repo
 configs (máy chỉ chuyển khi config mới lên GitHub, lúc đó domain mới đã đủ file). `reg sync-configs`: kéo rs_domain mọi config về đúng env.
+
+**Đổi api_domain** ([13] / `reg set-api-domain <env> <url>`): ghi `api_domain` của env vào `deploy.json` + `api_domain` mọi config app của env đó → bạn commit + push repo configs sau để app nhận config mới.
 
 Key SSH: `.env` (`SSH_KEY_FILE`, `SSH_KEY_PASS`, xem `.env.example`) — CLI
 `--key-file/--key-pass` > env > `ssh.key_file` trong target. Vẫn dùng được
