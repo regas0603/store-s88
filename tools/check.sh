@@ -83,6 +83,13 @@ sync_local() {
   fi
 }
 run_step "0. trạng thái cục bộ — package_config + dist/dynamic_interface.yaml khớp repo" sync_local
+if [ "$FAIL" != 0 ]; then
+  # Các bước sau đọc đúng 2 file này → chạy tiếp chỉ ra lỗi giả, che lỗi thật ở trên.
+  echo
+  echo "${RED}${BLD}Bước 0 FAIL — dừng${RST}: sửa lỗi ở trên rồi chạy lại (các bước sau sẽ báo lỗi giả)."
+  echo "  Hay gặp: thiếu ../app_package, ../main_app_package, ../engine (bash tools/setup.sh); app_package chưa pull bản mới."
+  exit 1
+fi
 run_step "1. app_package — áp template + kiểm ($PKG)" bash "$T/modprep.sh" apply --pkg "$PKG"
 for d in "${MAIN_APPS[@]}"; do
   run_step "2. $(app_label "$d") — main_app không kéo package module vào host" \
