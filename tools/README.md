@@ -18,7 +18,8 @@ Chỉ cần chạy `bash tools/dynpub.sh` rồi chọn số — không truyền 
 ── Hằng ngày
 [1] Ra patch                       compile → tool tự tính mỗi bản build chạy được tới đâu
 [2] Deploy lên rs_domain           bytecode trước, manifest sau
-[3] Xem kế hoạch (plan)
+[3] Xem kế hoạch (plan)            [1] tổng quan app: ✓ ABI mới nhất / ⚠ ABI cũ (dừng ở vN vì …) / ☠ đã chết / chưa live
+                                   [2-4] kế hoạch: ai chạy tới patch nào, ai bị mời/ép, mở đâu
 [4] Đưa patch lên env khác         vd staging → pre → prod
 ── Phát hành bản app
 [5] Build host (release app)       chọn app → platform → kiểu build → NGÀY UNLOCK; version_code TỰ TĂNG mỗi lần build (kể cả debug / không lên store)
@@ -30,10 +31,12 @@ Chỉ cần chạy `bash tools/dynpub.sh` rồi chọn số — không truyền 
 ── Sự cố / ép
 [7] Rút patch lỗi (retract)
 [8] Ép cập nhật / ép restart      [1] bắt cập nhật theo version_code · [2] cấm patch cũ (block-below)
-                                   · [3] ép restart (min_force_update) · [4] app thay thế chung (prod)
+                                   · [3] ép restart (min_force_update)
 ── Ít dùng
 [9] Quản lý app                    thêm app / đánh dấu app chết / Apple ID / đổi env
-[10] Kiểm link store / app thay thế
+[10] Link / app thay thế           [1] kiểm link (cron) · [2] app thay thế chung (prod, bundle Android / iOS)
+                                   · [3] link tải Android (APK / trang chủ, MỌI env) — thay market:// khi app Android không lên Play
+                                   Android chỉ dùng 1 trong [2] / [3] — đặt cái này thì cái kia bị bỏ
 [11] Đổi package host (ABI)
 [12] Đổi rs_domain của env
 [13] Đổi api_domain của env
@@ -58,7 +61,8 @@ không patch tới khi [6] + deploy ở máy có VPN.
 | Build release | máy build: [5] (tự commit, push để máy deploy kéo về) → nộp store → máy có VPN: [6] `submitted` → deploy → duyệt xong [6] `live` → deploy |
 | Ra patch | `check.sh` → [1] → chọn env (vd staging) → xem bảng compat → deploy → [4] đưa lên pre / prod |
 | Patch đổi package host | [1] báo FAIL ràng buộc version → [11] nhận version mới (pub get + chụp mốc + commit lock) → [5] build lại các app còn update được → [6] khi lên store → [1] → deploy |
-| App chết (bị gỡ / không update được nữa) | [8] → App thay thế chung (1 lần, prod) → [9] → đánh dấu app chết (user được mời sang app thay thế, từ chối được) |
+| Android không lên Play | [10] → Link tải Android → nhập link APK / trang chủ (1 lần, áp cả staging / pre / prod). Mọi popup Android (update chính app, app chết, bị ép) mở link này; đặt link = bỏ app thay thế chung Android (và ngược lại: [10] → App thay thế chung chọn app Android = bỏ link). `none` = quay lại Play |
+| App chết (bị gỡ / không update được nữa) | [10] → App thay thế chung (1 lần, prod) → [9] → đánh dấu app chết (user được mời sang app thay thế, từ chối được) |
 | Cấm patch cũ | [8] → Cấm patch cũ → N → xem trước → áp dụng. Máy bị cấm: update chính app nếu store có bản live chạy được >= N, không thì app thay thế chung |
 | Ép update vì lỗi app | build bản sửa → `live` → [8] → Bắt cập nhật theo version_code (không có bản cao hơn → app thay thế chung) |
 | Patch lỗi | [7] → máy chưa tải dừng ở bản trước; máy đã tải cần patch mới |
@@ -84,7 +88,7 @@ không patch tới khi [6] + deploy ở máy có VPN.
 `configs/apps/<bundleId>.json`, chọn lúc thêm app, đổi ở [9]). Mỗi env 1
 `rs_domain` + 1 manifest chỉ chứa app + patch của env đó. Ra patch ([1]) xong
 chọn env; đưa lên env khác sau bằng [4]. block-below ([8] → Cấm patch cũ) theo env; retract
-([7]) rút khỏi mọi env. App thay thế chung ([8] → App thay thế chung) chỉ có ở env prod — env khác: app chết không được mời, bị ép mà không có bản cao hơn thì validator chặn.
+([7]) rút khỏi mọi env. App thay thế chung ([10] → App thay thế chung) chỉ có ở env prod — env khác: app chết không được mời, bị ép mà không có bản cao hơn thì validator chặn.
 
 `configs/deploy.json` — mỗi target = 1 env, file lên `<ssh.path>/app/`
 (= `<rs_domain>/app/`) — chỉ bytecode + manifest, config app không lên server:
@@ -130,7 +134,7 @@ Host tĩnh rs_domain: bật HTTPS, gzip, ETag; `manifest/*.json` để
 ```bash
 bash tools/dynpub.sh release --app com.example.host1 --platform android [--version 1.0.13+13]   # bỏ --version = tự tăng
 bash tools/dynpub.sh patch --envs staging[,pre,prod] [--min-force-update N]
-bash tools/dynpub.sh reg plan | reg validate | reg deploy [--env E] [--bundle B] [--dry-run] | reg check-links
+bash tools/dynpub.sh reg apps [--env E] | reg android-url [URL|none] | reg plan | reg validate | reg deploy [--env E] [--bundle B] [--dry-run] | reg check-links
 DYNPUB_YES=1 …     # tự trả lời Y cho câu hỏi deploy/commit
 ```
 

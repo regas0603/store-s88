@@ -19,7 +19,8 @@ Thiết kế: docs/release_registry_design.md. Dữ liệu (track git):
                                 deploy chỉ dùng file này
   registry/bundles.json         trạng thái bundle (active/retired, app thay thế…)
   registry/patches/v<N>.json    requires + file/hash/size của từng patch
-  registry/policy.json          min_allowed_patch, popup, app thay thế chung (replacement_app — chỉ prod)
+  registry/policy.json          min_allowed_patch, popup, app thay thế chung (replacement_app — chỉ prod),
+                                link tải Android chung mọi env (android_url)
                                 (mặc định chung + "envs": {<env>: ghi đè})
   registry/compat.json          SINH RA: env → abi_id → max_patch + lý do dừng
 
@@ -41,6 +42,9 @@ Lệnh (dynpub.sh wizard gọi; gọi tay khi cần):
                                           (rejected chỉ từ submitted → bỏ khỏi store/, bản trước giữ nguyên)
   bundle-add <bundle> [--env E] | bundle-retire <bundle> | bundle-activate <bundle>
   replacement-app --android B|none --ios B|none
+  android-url [https://…|none]          (không tham số = in link đang đặt; đặt link = bỏ app
+                                          thay thế chung Android và ngược lại — chỉ dùng 1) link tải Android CHUNG mọi env (APK / trang chủ) thay
+                                          market:// — update chính app, app chết, bị ép đều mở link này
                                           app thay thế CHUNG của env prod (mỗi platform 1 app):
                                           app chết / app bị ép mà không có bản cao hơn → mở app này
   set-env <bundle> <env>                 chuyển app sang env khác (config + manifest)
@@ -51,6 +55,8 @@ Lệnh (dynpub.sh wizard gọi; gọi tay khi cần):
   force-vc <bundle> <platform> <below_vc|0>
   block-below <N> --env E [--dry-run]
   retract <N>                             (rút khỏi MỌI env)
+  apps [--env E]                          tổng quan theo app: sống/chết, store, ABI mới nhất / cũ,
+                                          máy nào bị ép / gợi ý → mở app / link nào
   plan [--env E] [--bundle B] | regen | validate | check-links
   changed-envs [--clear]                  env có manifest/config đổi mà chưa deploy (deploy xong tự xoá)
   deploy [--env E]… [--bundle B] [--dry-run] [--no-configs] [--key-file F] [--key-pass P]
@@ -102,7 +108,7 @@ STORE_STATES = ("built", "submitted", "live", "removed", "rejected")
 # Mode build chạy được module (engine ddm). Build engine stock không đăng ký.
 MODULE_MODES = ("ddm", "adhoc", "appstore")
 
-RED, GRN, YEL, DIM, RST = "\033[31m", "\033[32m", "\033[33m", "\033[2m", "\033[0m"
+RED, GRN, YEL, CYN, DIM, RST = "\033[31m", "\033[32m", "\033[33m", "\033[36m", "\033[2m", "\033[0m"
 
 
 def ok(m): print(f"  {GRN}[PASS]{RST} {m}")
@@ -722,7 +728,9 @@ class Links:
 
     def store_url(self, bundle, platform):
         if platform == "android":
-            return f"market://details?id={bundle}"
+            # Không dùng Play: mọi link Android (update chính app / app thay
+            # thế) mở link tải chung (policy android_url — mọi env).
+            return self.reg.policy.get("android_url") or f"market://details?id={bundle}"
         b = self.reg.bundles.get(bundle) or {}
         app_id = b.get("ios_app_id")
         if not app_id and bundle not in self._tried and bundle in self.reg.bundles:
@@ -805,6 +813,10 @@ def compute_actions(reg, compat, links):
         """App thay thế CHUNG (chỉ env prod — policy.envs.prod.replacement_app)."""
         return (pol.get("replacement_app") or {}).get(platform)
 
+    def fallback_link(platform):
+        """Link tải Android chung (mọi env) — thay app thay thế khi không có."""
+        return pol.get("android_url") if platform == "android" else None
+
     def check_redirect(dest, platform, label, as_error):
         """App thay thế phải active, có build live trên platform, build đó không bị force."""
         sink = errors if as_error else warnings
@@ -850,12 +862,15 @@ def compute_actions(reg, compat, links):
                 row["via"] = "own"
             else:
                 dest = replacement(p)
-                if not dest or dest == b:
+                if (not dest or dest == b) and fallback_link(p):
+                    row["url"] = fallback_link(p)
+                    row["via"] = "link"
+                elif not dest or dest == b:
                     errors.append(
                         f"{b}/{p}/{vc}: bị force nhưng "
                         + ("app đã chết" if bun.get("status") == "retired" else "store của app chưa có bản cao hơn đạt ngưỡng")
-                        + (f" và app thay thế chung {p} chính là app này (menu [8] → App thay thế chung)" if dest == b
-                           else " và chưa có app thay thế chung (menu [8] → App thay thế chung)" if reg.env == REPLACE_ENV
+                        + (f" và app thay thế chung {p} chính là app này (menu [10] → App thay thế chung)" if dest == b
+                           else " và chưa có app thay thế chung (menu [10] → App thay thế chung)" if reg.env == REPLACE_ENV
                            else f" — env {reg.env} không có app thay thế chung (chỉ {REPLACE_ENV})")
                         + " → user kẹt")
                 else:
@@ -878,6 +893,9 @@ def compute_actions(reg, compat, links):
                     if checked[ck]:
                         row.update(action="soft", url=links.store_url(dest, p), via="redirect",
                                    why=f"chạy tới v{target}, app đã chết → mời sang {dest}")
+                elif fallback_link(p):
+                    row.update(action="soft", url=fallback_link(p), via="link",
+                               why=f"chạy tới v{target}, app đã chết → mời tải link Android")
             elif store_max > target:
                 row.update(action="soft", url=links.store_url(b, p), via="own",
                            why=f"chạy tới v{target}, store đã có bản chạy tới v{store_max}")
@@ -891,9 +909,9 @@ def compute_actions(reg, compat, links):
     for p in PLATFORMS:
         dead = sorted({b for b, bd in reg.builds() if bd["platform"] == p
                        and reg.bundles.get(b, {}).get("status") == "retired"})
-        if dead and not replacement(p):
+        if dead and not replacement(p) and not fallback_link(p):
             warnings.append(f"app đã chết {', '.join(dead)}: chưa có app thay thế chung {p}"
-                            + (" (menu [8] → App thay thế chung)" if reg.env == REPLACE_ENV
+                            + (" (menu [10] → App thay thế chung)" if reg.env == REPLACE_ENV
                                else f" — env {reg.env} không có app thay thế (chỉ {REPLACE_ENV}) → user không được mời"))
     if latest and compat and not any(c["max_patch"] == latest for c in compat.values()):
         warnings.append(f"patch mới nhất v{latest} chưa bản build nào chạy được (cần build host mới?)")
@@ -1199,7 +1217,8 @@ def print_plan(reg, res, bundle=None):
     ra = reg.policy.get("replacement_app") or {}
     print(f"latest = v{reg.latest()}   min_allowed_patch = v{reg.policy.get('min_allowed_patch') or 0}"
           + (f"   app thay thế chung = android:{ra.get('android') or '-'} ios:{ra.get('ios') or '-'}"
-             if reg.env == REPLACE_ENV else ""))
+             if reg.env == REPLACE_ENV else "")
+          + (f"   link tải Android = {reg.policy['android_url']}" if reg.policy.get("android_url") else ""))
     rows = [(k, r) for k, r in sorted(res.rows.items()) if not bundle or k[0] == bundle]
     if not rows:
         info("chưa có bản build nào lên store (registry/store/) — menu [6] để xác nhận")
@@ -1216,6 +1235,108 @@ def print_plan(reg, res, bundle=None):
             detail += f"  {DIM}dừng vì v{brk['patch']}: {brk['reason']}{RST}"
         print(f"  {f'{b}/{p}/{vc}'.ljust(w)}  {r['store']:9} {('v' + str(r['target'])) if r['target'] else '-':>5}  "
               f"{tag}  {detail}")
+
+
+def app_overview(reg, res):
+    """Tổng quan theo APP của 1 env, mỗi (bundle, platform) 1 dòng:
+      dead     app đã đánh dấu chết (menu [9])
+      store    bản mới nhất trong registry/store/ + trạng thái (live / removed / …)
+      abi      latest  = bản live chạy được patch mới nhất của env
+               old     = bản live dừng ở patch cũ (ABI cũ → cần build lại)
+               no_live = có bản build nhưng chưa bản nào live
+               no_build = chưa có bản build nào
+      moves    máy đang bị ép / được mời: [{action, vcs, dest, url}] — dest =
+               bundle được mở (chính app hoặc app thay thế chung)
+      pending  bản build mới hơn bản live, chưa live + patch nó chạy được."""
+    latest = reg.latest()
+    ra = (reg.policy.get("replacement_app") or {}) if reg.env == REPLACE_ENV else {}
+    out = []
+    for b in sorted(reg.bundles):
+        dead = reg.bundles[b].get("status") == "retired"
+        base = {"bundle": b, "dead": dead, "latest": latest, "live_vc": None, "abi_id": None,
+                "target": 0, "why": None, "store": None, "moves": [], "pending": None}
+        plats = sorted({bd["platform"] for _, bd in reg.all_builds(b)}, key=PLATFORMS.index)
+        if not plats:
+            out.append(dict(base, platform="-", abi="no_build"))
+            continue
+        for p in plats:
+            row = dict(base, platform=p, abi="no_live", moves=[])
+            in_store = [bd for _, bd in reg.builds(b) if bd["platform"] == p]
+            if in_store:
+                nb = max(in_store, key=lambda x: x["version_code"])
+                row["store"] = {"vc": nb["version_code"], "state": nb["store"]}
+            sb = store_build(reg, b, p)
+            if sb:
+                brk = (res.compat.get(sb["abi_id"]) or {}).get("first_break")
+                row.update(live_vc=sb["version_code"], abi_id=sb["abi_id"],
+                           target=(res.compat.get(sb["abi_id"]) or {}).get("max_patch", 0),
+                           why=f"v{brk['patch']}: {brk['reason']}" if brk else None)
+                row["abi"] = "latest" if row["target"] >= latest else "old"
+            moves = {}
+            for bd in sorted(in_store, key=lambda x: x["version_code"]):
+                r = res.rows.get((b, p, bd["version_code"])) or {}
+                if r.get("action", "none") == "none":
+                    continue
+                dest = {"own": b, "redirect": ra.get(p)}.get(r["via"])
+                moves.setdefault((r["action"], dest, r["url"]), []).append(bd["version_code"])
+            row["moves"] = [{"action": a, "dest": d, "url": u, "vcs": v} for (a, d, u), v in moves.items()]
+            newer = [bd for _, bd in reg.all_builds(b) if bd["platform"] == p
+                     and bd["version_code"] > (row["live_vc"] or 0)]
+            if newer:
+                nb = max(newer, key=lambda x: x["version_code"])
+                row["pending"] = {"vc": nb["version_code"], "abi_id": nb["abi_id"],
+                                  "store": reg.store_state(b, p, nb["version_code"]),
+                                  "target": (res.compat.get(nb["abi_id"]) or {}).get("max_patch", 0)}
+            out.append(row)
+    return out
+
+
+def print_app_overview(reg, res):
+    rows = app_overview(reg, res)
+    print()
+    print(f"══ env {reg.env}   latest = v{reg.latest()}"
+          + ("   (chưa có patch nào trong env)" if not reg.latest() else "")
+          + (f"   link tải Android = {reg.policy['android_url']}" if reg.policy.get("android_url") else ""))
+    if not rows:
+        info("chưa có app nào trong env")
+        return rows
+    abi_tag = {k: c + t.ljust(14) + RST for k, (c, t) in {
+        "latest": (GRN, "✓ ABI mới nhất"), "old": (YEL, "⚠ ABI cũ"),
+        "no_live": (DIM, "· chưa live"), "no_build": (DIM, "· chưa build")}.items()}
+    w = max(len(f"{r['bundle']}/{r['platform']}") for r in rows)
+    for r in rows:
+        st = r["store"]
+        store = (f"{st['state']} vc{st['vc']}" if st else "chưa lên store")
+        if st and r["live_vc"] and r["live_vc"] != st["vc"]:
+            store += f" (live vc{r['live_vc']})"
+        sc = {"live": GRN, "submitted": YEL, "removed": RED}.get(st["state"], DIM) if st else DIM
+        store = sc + store.ljust(26) + RST
+        alive = RED + "☠ CHẾT" + RST if r["dead"] else GRN + "● sống" + RST
+        patch = f"v{r['target'] or '-'}/v{r['latest']}" if r["live_vc"] else ""
+        print(f"  {(r['bundle'] + '/' + r['platform']).ljust(w)}  {alive}  {store} "
+              f"{abi_tag[r['abi']]}  {patch.ljust(7)}  {DIM}{r['abi_id'] or ''}{RST}")
+        sub = []
+        if r["abi"] == "old" and r["why"]:
+            sub.append(f"{YEL}dừng vì{RST} {DIM}{r['why']}{RST}")
+        for m in r["moves"]:
+            kind = RED + "ÉP" + RST if m["action"] == "force" else YEL + "gợi ý" + RST
+            dest = ("chính app" if m["dest"] == r["bundle"] else m["dest"] or "link tải Android")
+            sub.append(f"máy {', '.join('vc' + str(v) for v in m['vcs'])}: {kind} → {dest}  {DIM}{m['url']}{RST}")
+        if r["dead"] and not r["moves"] and r["store"]:
+            sub.append(RED + "không mời / ép ai — "
+                       + ("chưa có app thay thế chung (menu [10])" if reg.env == REPLACE_ENV
+                          else f"env {reg.env} không có app thay thế (chỉ {REPLACE_ENV})") + RST)
+        pd = r["pending"]
+        pd_ok = bool(pd and r["latest"] and pd["target"] >= r["latest"])
+        if pd:
+            sub.append(f"vc{pd['vc']} {pd['store']} "
+                       + (f"chạy tới v{pd['target']}" if pd["target"] else "chưa patch nào chạy được")
+                       + (CYN + " → [6] lên store" + RST if pd_ok and not r["dead"] else ""))
+        if r["abi"] == "old" and not pd_ok and not r["dead"]:
+            sub.append(CYN + "→ [5] build lại" + RST)
+        for s in sub:
+            print(f"      {s}")
+    return rows
 
 
 def print_patch_report(reg, res, v):
@@ -1406,6 +1527,8 @@ def check_links(reg):
                 dest = b if r["via"] == "own" else None
                 targets.add((r["url"], p, dest))
     links = Links(reg)
+    if reg.policy.get("android_url"):
+        targets.add((reg.policy["android_url"], "android", None))
     ra = reg.policy_for(REPLACE_ENV).get("replacement_app") or {}
     for b in reg.bundles:
         for p in PLATFORMS:
@@ -1443,6 +1566,14 @@ def _link_alive(url, platform):
             return status == 200
         except urllib.error.HTTPError as e:
             return False if e.code == 404 else None
+        except Exception:
+            return None
+    if url.startswith(("http://", "https://")) and "apps.apple.com" not in url:
+        try:
+            status, _ = _http_get(url)
+            return status < 400
+        except urllib.error.HTTPError as e:
+            return False if e.code in (404, 410) else None
         except Exception:
             return None
     m = re.search(r"/id(\d+)", url)
@@ -1729,6 +1860,26 @@ def main(argv):
         print()
         report_issues(ev)
         return 1 if ev.errors else 0
+    if cmd == "apps":
+        env = _opt(a, "--env")
+        ev = evaluate(reg, check_files=False, only=[env] if env else None)
+        count = {}
+        for e, res in ev.envs.items():
+            for r in print_app_overview(reg.scoped(e), res):
+                for k in ["dead" if r["dead"] else r["abi"]] + [m["action"] for m in r["moves"]]:
+                    count[k] = count.get(k, 0) + 1
+        loose = [b for b in sorted(reg.bundles) if not app_env(b)]
+        if loose and not env:
+            print()
+            warn(f"chưa gán env (không nằm trong manifest nào): {', '.join(loose)}")
+        print()
+        names = {"latest": "ABI mới nhất", "old": "ABI cũ", "dead": "chết", "no_live": "chưa live",
+                 "no_build": "chưa build", "force": "nhóm máy bị ép", "soft": "nhóm máy được gợi ý"}
+        print("  tổng: " + "  ·  ".join(f"{names[k]} {count[k]}" for k in names if count.get(k)))
+        return 0
+    if cmd == "android-url" and not a:
+        print(reg.policy.get("android_url") or "")
+        return 0
     if cmd == "validate":
         ev = evaluate(reg)
         report_issues(ev)
@@ -1866,9 +2017,27 @@ def main(argv):
                     raise RegError(f"{dest} đã đánh dấu chết — không làm app thay thế được")
                 if not store_build(sc, dest, p):
                     raise RegError(f"{dest} chưa có bản {p} live trên store")
+                if p == "android" and reg.policy.pop("android_url", None):
+                    # Android chỉ dùng 1 trong 2: app thay thế chung HOẶC link tải.
+                    info("bỏ link tải Android (Android chỉ dùng 1: app thay thế chung hoặc link tải)")
             ra[p] = dest
             info(f"app thay thế chung {p}: {dest or '(bỏ trống)'}")
         reg.set_policy(env=REPLACE_ENV, replacement_app=ra)
+    elif cmd == "android-url":
+        url = _none(a[0])
+        if url and not re.match(r"^https?://\S+$", url):
+            raise RegError(f"link lạ: {url} (dạng https://…)")
+        if url:
+            reg.policy["android_url"] = url
+            ra = (reg.policy.get("envs") or {}).get(REPLACE_ENV, {}).get("replacement_app") or {}
+            if ra.get("android"):
+                # Android chỉ dùng 1 trong 2: link tải HOẶC app thay thế chung.
+                info(f"bỏ app thay thế chung Android ({ra['android']}) — Android chỉ dùng 1: link tải hoặc app thay thế")
+                reg.set_policy(env=REPLACE_ENV, replacement_app=dict(ra, android=None))
+        else:
+            reg.policy.pop("android_url", None)
+        reg.dirty.add("policy.json")
+        info(f"link tải Android (mọi env): {url or '(bỏ — quay lại market:// của Play)'}")
     elif cmd == "bundle-activate":
         reg.set_bundle(a[0], status="active")
     elif cmd == "ios-app-id":

@@ -12,7 +12,7 @@
 #   ── Hằng ngày
 #   [1] Ra patch                       app_package → .bytecode → chọn env → registry → manifest
 #   [2] Deploy lên rs_domain           theo env / theo app: bytecode → manifest lên server, rồi chép config sang ../configs/apps
-#   [3] Xem kế hoạch (plan)            ai chạy tới patch nào, ai bị mời/ép, mở đâu
+#   [3] Xem kế hoạch (plan)            tổng quan app (ABI mới nhất / ABI cũ / chết) · ai chạy tới patch nào, ai bị mời/ép, mở đâu
 #   [4] Đưa patch lên env khác         vd staging → pre → prod
 #   ── Phát hành bản app
 #   [5] Build host (release app)       chọn app → platform → kiểu build → ngày unlock (version_code tự tăng mỗi lần build)
@@ -24,10 +24,13 @@
 #        [1] Bắt cập nhật theo version_code  lỗi ở app: build < N phải lên store
 #        [2] Cấm patch cũ (block-below)      theo env — máy bị cấm update chính app nếu có bản cao hơn, không thì app thay thế chung
 #        [3] Ép restart (min_force_update)   patch đã ra: máy chạy patch < M, tải xong sẽ hiện popup khởi động lại
-#        [4] App thay thế chung (prod)       Android + iOS: app chết → mời sang; bị ép mà không có bản cao hơn → ép sang
 #   ── Ít dùng
 #   [9] Quản lý app                    thêm app (chọn env) / đổi env / đánh dấu app chết / Apple ID
-#   [10] Kiểm link store / app thay thế (cron)
+#   [10] Link / app thay thế
+#        [1] Kiểm link (cron)                link store của bản live + app thay thế + link tải Android còn sống không
+#        [2] App thay thế chung (prod)       Android + iOS: app chết → mời sang; bị ép mà không có bản cao hơn → ép sang
+#        [3] Link tải Android (mọi env)      APK / trang chủ thay market:// — update chính app, app chết, bị ép đều mở link này
+#            Android chỉ dùng 1 trong [2] / [3]: đặt cái này thì cái kia bị bỏ
 #   [11] Đổi package host (ABI)        app_package đòi version / package host mới → pub get → xác nhận → chụp mốc + commit lock
 #        [1] Chỉ sửa manifest / mốc ràng buộc   host KHÔNG đổi (package nội bộ module mới, nới ràng buộc)
 #        [2] Nhận ABI host mới                 package host mới / đổi version → [5] build lại app
@@ -40,7 +43,7 @@
 #   bash tools/dynpub.sh release --app <bundleId> --platform ios|android [--version 1.0.5+5] [--mode M] [--unlock D]
 #        (bỏ --version = tự tăng; --unlock như wizard: 2026-10-20 | 20/10/2026 | +3 | 0 | -1 — bỏ = giữ ngày đang có trong code)
 #   bash tools/dynpub.sh patch --envs staging[,pre,prod] [--min-force-update N]
-#   bash tools/dynpub.sh reg <lệnh registry…>     # vd: reg check-links | reg plan | reg deploy --env staging
+#   bash tools/dynpub.sh reg <lệnh registry…>     # vd: reg apps | reg check-links | reg plan | reg deploy --env staging
 #
 # Mode build:
 #   Android : ddm (mặc định — engine ddm, module OTA) | debug (engine stock, không đăng ký registry)
@@ -227,7 +230,7 @@ choose_platform() {
 }
 
 # Chọn app (trong <env>) có bản <platform> live: pick_redirect <platform> <min_patch|-> <env> [exclude]
-# → $REDIRECT (rỗng = bỏ trống). Dùng cho app thay thế chung ([8] → App thay thế chung).
+# → $REDIRECT (rỗng = bỏ trống). Dùng cho app thay thế chung ([10] → App thay thế chung).
 pick_redirect() {
   local p="$1" mp="$2" env="$3" ex="${4:-}" l
   local -a args=(redirect-candidates "$p" --env "$env") ids=() labels=()
@@ -837,7 +840,7 @@ menu_app() {
   case "$CHOICE" in
     1)
       if [ "$cur_env" = prod ]; then
-        info "user của $BUNDLE sẽ được mời sang app thay thế chung (menu [8] → App thay thế chung)"
+        info "user của $BUNDLE sẽ được mời sang app thay thế chung (menu [10] → App thay thế chung)"
       else
         info "$BUNDLE ở env ${cur_env:-?} — chỉ prod có app thay thế chung, user sẽ KHÔNG được mời sang app khác"
       fi
@@ -866,14 +869,38 @@ menu_force() {
   choose "Ép cập nhật / ép restart:" \
     "Bắt cập nhật app theo số build (version_code) — lỗi ở app, không liên quan patch" \
     "Cấm patch cũ (block-below) — theo env" \
-    "Ép restart máy chạy patch cũ (min_force_update)" \
-    "App thay thế chung (prod) — cho app chết / app bị ép"
+    "Ép restart máy chạy patch cũ (min_force_update)"
   case "$CHOICE" in
     1) menu_force_vc ;;
     2) menu_block ;;
     3) menu_force_restart ;;
-    4) menu_replacement ;;
   esac
+}
+
+menu_links() {
+  choose "Link / app thay thế:" \
+    "Kiểm link (store của bản live, app thay thế, link tải Android)" \
+    "App thay thế chung (prod) — chọn bundle Android / iOS cho app chết / app bị ép" \
+    "Link tải Android (APK / trang chủ) — thay Play cho MỌI env"
+  case "$CHOICE" in
+    1) reg check-links ;;
+    2) menu_replacement ;;
+    3) menu_android_url ;;
+  esac
+}
+
+# Android không lên Play: mọi popup Android (update chính app / app chết / bị
+# ép) mở 1 link chung thay market:// — áp cho cả staging, pre, prod.
+menu_android_url() {
+  local cur
+  cur="$(reg android-url)" || return 1
+  info "link này thay market:// cho MỌI popup Android ở mọi env: update chính app, app chết, app bị ép"
+  info "Android chỉ dùng 1: đặt link = BỎ app thay thế chung Android ([10] → App thay thế chung)"
+  info "đang đặt: ${cur:-(chưa — đang mở Play market://)}"
+  ask "Link tải Android (https://… — 'none' = bỏ, quay lại Play)" "${cur:-none}"
+  local url="$REPLY"
+  reg android-url "$url" || return 1
+  after_write "link tải Android → $url"
 }
 
 menu_force_vc() {
@@ -894,11 +921,11 @@ menu_block() {
   reg list-patches | awk -F'\t' -v e="$env" '$4 == "*" || index("," $4 ",", "," e ",") {printf "  v%s  %s\n", $1, $2}' | tail -15
   ask "[$env] Cấm chơi patch NHỎ HƠN"
   local n="$REPLY"
-  info "máy bị cấm: mở store của chính app nếu đã có bản live chạy được >= v$n; không thì app thay thế chung (prod, menu [8] → App thay thế chung)"
+  info "máy bị cấm: mở store của chính app nếu đã có bản live chạy được >= v$n; không thì app thay thế chung (prod, menu [10] → App thay thế chung)"
   echo
   echo "== Xem trước (chưa ghi) =="
   if ! reg block-below "$n" --env "$env" --dry-run; then
-    echo; info "validator chặn — lên store bản mới đủ ngưỡng, hoặc đặt app thay thế chung ([8] → App thay thế chung)"; return 1
+    echo; info "validator chặn — lên store bản mới đủ ngưỡng, hoặc đặt app thay thế chung ([10] → App thay thế chung)"; return 1
   fi
   yes_no "Áp dụng: [$env] cấm patch < v$n?" N || { info "huỷ"; return 0; }
   reg block-below "$n" --env "$env" >/dev/null || return 1
@@ -907,13 +934,22 @@ menu_block() {
 
 # App thay thế CHUNG (chỉ prod), mỗi platform 1 app: app chết → mời sang;
 # app bị ép (cấm patch cũ / bắt cập nhật) mà store không có bản cao hơn → ép sang.
+# Android chỉ dùng 1 trong 2: app thay thế chung ([10][2]) HOẶC link tải ([10][3]) —
+# đặt cái này thì cái kia bị bỏ.
 menu_replacement() {
-  local a i
+  local a i url
+  url="$(reg android-url)" || return 1
   info "app thay thế chung chỉ áp cho env prod — chọn app prod đang có bản live"
+  if [ -n "$url" ]; then
+    info "Android đang dùng link tải $url — chọn 1 app = BỎ link; bỏ trống = giữ link"
+  fi
   pick_redirect android - prod; a="$REDIRECT"
   pick_redirect ios - prod; i="$REDIRECT"
+  if [ -n "$a" ] && [ -n "$url" ]; then
+    yes_no "Đặt $a làm app thay thế Android và BỎ link tải $url?" N || { info "huỷ"; return 0; }
+  fi
   reg replacement-app --android "${a:-none}" --ios "${i:-none}" || return 1
-  after_write "app thay thế chung android→${a:-none} ios→${i:-none}"
+  after_write "app thay thế chung android→${a:-${url:-none}} ios→${i:-none}"
 }
 
 menu_retract() {
@@ -933,11 +969,14 @@ menu_retract() {
 }
 
 menu_plan() {
-  choose "Xem:" "Tất cả env" "1 env" "1 app"
+  choose "Xem:" \
+    "Tổng quan app — ABI mới nhất / ABI cũ / đã chết (mọi env)" \
+    "Kế hoạch tất cả env" "Kế hoạch 1 env" "Kế hoạch 1 app"
   case "$CHOICE" in
-    1) reg plan || true ;;
-    2) choose_env; reg plan --env "$SEL_ENV" || true ;;
-    3) pick_bundle 0; reg plan --bundle "$BUNDLE" || true ;;
+    1) reg apps || true ;;
+    2) reg plan || true ;;
+    3) choose_env; reg plan --env "$SEL_ENV" || true ;;
+    4) pick_bundle 0; reg plan --bundle "$BUNDLE" || true ;;
   esac
 }
 
@@ -1074,17 +1113,17 @@ main_menu() {
     "--Hằng ngày" \
     "Ra patch" \
     "Deploy lên rs_domain" \
-    "Xem kế hoạch (plan)" \
+    "Xem kế hoạch (plan) / tổng quan app (ABI mới nhất · ABI cũ · chết)" \
     "Đưa patch lên env khác (staging → pre → prod)" \
     "--Phát hành bản app" \
     "Build host (release app)" \
     "Cập nhật trạng thái store của 1 bản build" \
     "--Sự cố / ép" \
     "Rút patch lỗi (retract)" \
-    "Ép cập nhật / ép restart (bắt cập nhật · cấm patch cũ · min_force_update · app thay thế)" \
+    "Ép cập nhật / ép restart (bắt cập nhật · cấm patch cũ · min_force_update)" \
     "--Ít dùng" \
     "Quản lý app (thêm app / đánh dấu app chết / Apple ID / đổi env)" \
-    "Kiểm link store / app thay thế" \
+    "Link / app thay thế (kiểm link · app thay thế chung · link tải Android)" \
     "Nhận đổi version package host (đổi ABI)" \
     "Đổi rs_domain của env" \
     "Đổi api_domain của env" \
@@ -1100,7 +1139,7 @@ main_menu() {
     7) menu_retract ;;
     8) menu_force ;;
     9) menu_app ;;
-    10) reg check-links ;;
+    10) menu_links ;;
     11) menu_host_pkg ;;
     12) menu_rs_domain ;;
     13) menu_api_domain ;;

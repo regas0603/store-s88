@@ -4,7 +4,9 @@ host1..7 build lại được, hostA kẹt; v8 đổi lottie; v14 cấm v7.
 
 Chạy: python3 tools/registry/test_registry.py
 """
+import contextlib
 import hashlib
+import io
 import json
 import os
 import shutil
@@ -12,6 +14,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.dont_write_bytecode = True
 os.environ["REGISTRY_OFFLINE"] = "1"
@@ -231,6 +234,92 @@ class ScenarioTest(Base):
         r = self.row(res, "com.example.host1", "android", 12)
         self.assertEqual((r["action"], r["url"]), ("force", "market://details?id=com.example.host1"))
         self.assertEqual(self.row(res, "com.example.host1", "android", 13)["action"], "none")
+
+    def test_app_overview(self):
+        self.patch(requires(lottie="3.7.0"), "v8")
+        self.build("com.example.host1", "android", 13, provides(lottie="3.7.0"), store="submitted")
+        self.reg.set_bundle("com.example.hostA", status="retired")
+        self.build("com.example.hostD", "android", 20, provides(lottie="3.7.0"))
+        self.reg.set_policy(env="prod", replacement_app={"android": "com.example.hostD"})
+        self.reg.add_bundle("com.example.empty")
+        R._bundle_cfg_set("com.example.empty", "prod", R.load_envs())
+        res = self.ev()
+        rows = {(r["bundle"], r["platform"]): r for r in R.app_overview(self.reg.scoped("prod"), res)}
+        h1 = rows[("com.example.host1", "android")]
+        self.assertEqual((h1["dead"], h1["abi"], h1["live_vc"], h1["target"]), (False, "old", 12, 7))
+        self.assertEqual(h1["store"], {"vc": 13, "state": "submitted"})
+        self.assertIn("lottie", h1["why"])
+        self.assertEqual((h1["pending"]["vc"], h1["pending"]["target"]), (13, 8))
+        self.assertEqual(h1["moves"], [])  # chưa có bản cao hơn live → không mời
+        self.assertEqual(rows[("com.example.hostD", "android")]["abi"], "latest")
+        a = rows[("com.example.hostA", "android")]
+        self.assertEqual((a["dead"], a["abi"]), (True, "old"))
+        self.assertEqual(a["moves"], [{"action": "soft", "dest": "com.example.hostD", "vcs": [12],
+                                       "url": "market://details?id=com.example.hostD"}])
+        self.assertEqual(rows[("com.example.hostA", "ios")]["moves"], [])  # chưa có app thay thế iOS
+        self.assertEqual(rows[("com.example.empty", "-")]["abi"], "no_build")
+        self.reg.set_policy(env="prod", min_allowed_patch=8)
+        a = {(r["bundle"], r["platform"]): r for r in R.app_overview(self.reg.scoped("prod"), self.ev())}
+        m = a[("com.example.hostA", "android")]["moves"]
+        self.assertEqual([(x["action"], x["dest"]) for x in m], [("force", "com.example.hostD")])
+
+    def test_android_url_replaces_play_everywhere(self):
+        url = "https://dl.example.com/app"
+        self._v14()
+        self.reg.policy["android_url"] = url
+        self.reg.set_bundle("com.example.hostA", status="retired")
+        for env in ("staging", "pre"):  # link chung → cả env không có app thay thế
+            self.build("com.example.stg", "android", 3, provides(), env=env)
+            self.reg.add_patch(self.reg.patches[14]["file"], self.reg.patches[14]["hash"],
+                               self.reg.patches[14]["size"], requires(lottie="3.7.0"), envs=[env])
+            self.reg.set_bundle("com.example.stg", status="retired")
+            r = self.ev(env).rows[("com.example.stg", "android", 3)]
+            self.assertEqual((r["action"], r["url"], r["via"]), ("soft", url, "link"), env)
+        res = self.ev()
+        self.assertEqual(res.errors, [])
+        # app sống, store có bản cao hơn → update chính nó, nhưng mở link chung
+        h = self.row(res, "com.example.host1", "android", 12)
+        self.assertEqual((h["action"], h["url"], h["via"]), ("soft", url, "own"))
+        # app chết, không có app thay thế chung → link chung
+        a = self.row(res, "com.example.hostA", "android", 12)
+        self.assertEqual((a["action"], a["url"], a["via"]), ("soft", url, "link"))
+        # bị ép, không có bản cao hơn / app thay thế → link chung thay vì lỗi "kẹt"
+        self.reg.set_policy(env="prod", min_allowed_patch=8)
+        res = self.ev()
+        self.assertFalse([e for e in res.errors if "/android/" in e])
+        self.assertTrue(any("hostA/ios/9" in e and "kẹt" in e for e in res.errors))  # iOS vẫn cần app thay thế
+        a = self.row(res, "com.example.hostA", "android", 12)
+        self.assertEqual((a["action"], a["url"], a["via"]), ("force", url, "link"))
+        mv = {(r["bundle"], r["platform"]): r for r in R.app_overview(self.reg.scoped("prod"), res)}
+        self.assertEqual(mv[("com.example.hostA", "android")]["moves"][0]["dest"], None)
+        # iOS không đổi
+        i = self.row(res, "com.example.hostA", "ios", 9)
+        self.assertNotEqual(i["url"], url)
+
+    def test_android_url_and_replacement_exclusive(self):
+        """Android chỉ dùng 1: đặt link tải = bỏ app thay thế Android, và ngược lại."""
+        self._v14()
+        self.reg.save()
+        root, load = self.reg.root, R.Registry.load
+        url = "https://dl.example.com/app"
+
+        def run(*args):
+            with mock.patch.object(R.Registry, "load", staticmethod(lambda r=None: load(root))), \
+                 contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(R.main(list(args)), 0)
+            return load(root).policy
+
+        pol = run("replacement-app", "--android", "com.example.hostD", "--ios", "com.example.hostD")
+        self.assertEqual(pol["envs"]["prod"]["replacement_app"]["android"], "com.example.hostD")
+        pol = run("android-url", url)
+        self.assertEqual(pol["android_url"], url)
+        self.assertIsNone(pol["envs"]["prod"]["replacement_app"]["android"])
+        self.assertEqual(pol["envs"]["prod"]["replacement_app"]["ios"], "com.example.hostD")  # iOS giữ nguyên
+        pol = run("replacement-app", "--android", "none", "--ios", "com.example.hostD")
+        self.assertEqual(pol.get("android_url"), url)  # bỏ trống Android → giữ link
+        pol = run("replacement-app", "--android", "com.example.hostD", "--ios", "com.example.hostD")
+        self.assertNotIn("android_url", pol)
+        self.assertEqual(pol["envs"]["prod"]["replacement_app"]["android"], "com.example.hostD")
 
     def test_retract_lowers_target(self):
         self._v14()

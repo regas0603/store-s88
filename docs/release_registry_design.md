@@ -422,10 +422,10 @@ Việc cần làm:
   [6] Cập nhật trạng thái store của 1 bản build
   ── Sự cố / ép
   [7] Rút patch lỗi (retract)
-  [8] Ép cập nhật / ép restart (bắt cập nhật · cấm patch cũ · min_force_update · app thay thế)
+  [8] Ép cập nhật / ép restart (bắt cập nhật · cấm patch cũ · min_force_update)
   ── Ít dùng
   [9] Quản lý app (thêm app / đánh dấu app chết / Apple ID / đổi env)
-  [10] Kiểm link store / app thay thế
+  [10] Link / app thay thế (kiểm link · app thay thế chung · link tải Android)
   [11] Nhận đổi version package host (đổi ABI)
   [12] Đổi rs_domain của env
 Chọn [1-12]:
@@ -599,7 +599,7 @@ Bước nào ghi registry xong (trừ [5] Build host — chỉ tự commit), too
 4. App không build lại được → 7.6.
 
 ### 7.6 App không update được nữa (chuyển user sang app D)
-1. Menu **[8] → App thay thế chung** (prod) → chọn D. Menu **[9]** → chọn app → **đánh dấu app chết** → deploy.
+1. Menu **[10] → App thay thế chung** (prod) → chọn D. Menu **[9]** → chọn app → **đánh dấu app chết** → deploy.
    User app A thấy SOFT "Cập nhật / Để sau" mở app D, từ chối thì chơi tiếp.
 
 ### 7.7 Ép bỏ patch cũ (force)
@@ -621,7 +621,7 @@ Bước nào ghi registry xong (trừ [5] Build host — chỉ tự commit), too
 
 ### 7.10 App bị gỡ khỏi store ngoài ý muốn
 1. Menu **[6]** → các build `live` của app đó → `removed`.
-2. Đánh dấu app chết (menu **[9]**) + app thay thế chung (menu **[8]**) để sẵn link cho sau này.
+2. Đánh dấu app chết (menu **[9]**) + app thay thế chung (menu **[10]**) để sẵn link cho sau này.
 3. Deploy.
 
 Máy đang cài app đó **không bị làm phiền gì**: vẫn tải patch mới nhất bình
