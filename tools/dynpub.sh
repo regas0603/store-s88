@@ -29,8 +29,9 @@
 #   [10] Link / app thay thế
 #        [1] Kiểm link (cron)                link store của bản live + app thay thế + link tải Android còn sống không
 #        [2] App thay thế chung (prod)       Android + iOS: app chết → mời sang; bị ép mà không có bản cao hơn → ép sang
-#        [3] Link tải Android (mọi env)      APK / trang chủ thay market:// — update chính app, app chết, bị ép đều mở link này
-#            Android chỉ dùng 1 trong [2] / [3]: đặt cái này thì cái kia bị bỏ
+#        [3] Link tải Android (mọi env)      APK / trang chủ — DỰ PHÒNG: app / app thay thế không có trên Play, hoặc
+#                                            không có app thay thế → mở link này. Mỗi lần sinh manifest tool kiểm
+#                                            link Android 1 lần; link hỏng → báo ĐỎ ở dòng cuối
 #   [11] Đổi package host (ABI)        app_package đòi version / package host mới → pub get → xác nhận → chụp mốc + commit lock
 #        [1] Chỉ sửa manifest / mốc ràng buộc   host KHÔNG đổi (package nội bộ module mới, nới ràng buộc)
 #        [2] Nhận ABI host mới                 package host mới / đổi version → [5] build lại app
@@ -66,6 +67,13 @@ die() { echo "LỖI: $*" >&2; exit 1; }
 usage() { sed -n '2,/^set -euo/p' "$0" | sed 's/^# \{0,1\}//' | sed '$d'; }
 info() { echo "  [dynpub] $*"; }
 reg() { python3 -B "$REGPY" "$@"; }
+
+# Mỗi lần sinh manifest, registry kiểm link Android 1 lần (Play của từng app +
+# link tải chung) và ghi cảnh báo link hỏng → in ĐỎ ở dòng cuối khi tool thoát
+# (sau deploy / commit).
+export DYNPUB_RUN=1
+link_alerts() { reg link-alerts || true; }
+trap link_alerts EXIT
 idt() { python3 -B "$IDPY" "$@"; }
 
 # ── helpers tương tác ────────────────────────────────────────────────────────
@@ -539,7 +547,7 @@ apply_identity() {
   check_flutter
   eval "$(idt env "$b")"
   lock_reset
-  trap cleanup_identity EXIT
+  trap 'cleanup_identity; link_alerts' EXIT
   info "xuất main_app của ${b}…"
   bash "$T/build_main_app.sh" --src "$APP_MAIN_APP_SRC" --no-verify \
     || die "xuất main_app thất bại"
@@ -588,7 +596,7 @@ build_host() {
   # bản đăng ký registry giữ ngày unlock mới (commit cùng bản build); debug/profile trả lại
   if [ -n "$reg_mode" ]; then UNLOCK_PREV=""; fi
   cleanup_identity
-  trap - EXIT
+  trap link_alerts EXIT
   split_version "$ver"
   local out="$ROOT/dist/builds"
   mkdir -p "$out"
@@ -881,7 +889,7 @@ menu_links() {
   choose "Link / app thay thế:" \
     "Kiểm link (store của bản live, app thay thế, link tải Android)" \
     "App thay thế chung (prod) — chọn bundle Android / iOS cho app chết / app bị ép" \
-    "Link tải Android (APK / trang chủ) — thay Play cho MỌI env"
+    "Link tải Android (APK / trang chủ) — dự phòng khi không có trên Play (MỌI env)"
   case "$CHOICE" in
     1) reg check-links ;;
     2) menu_replacement ;;
@@ -889,15 +897,17 @@ menu_links() {
   esac
 }
 
-# Android không lên Play: mọi popup Android (update chính app / app chết / bị
-# ép) mở 1 link chung thay market:// — áp cho cả staging, pre, prod.
+# Link tải Android dự phòng (mọi env): app / app thay thế không có trên Play,
+# hoặc không có app thay thế → popup Android mở link này.
 menu_android_url() {
   local cur
   cur="$(reg android-url)" || return 1
-  info "link này thay market:// cho MỌI popup Android ở mọi env: update chính app, app chết, app bị ép"
-  info "Android chỉ dùng 1: đặt link = BỎ app thay thế chung Android ([10] → App thay thế chung)"
-  info "đang đặt: ${cur:-(chưa — đang mở Play market://)}"
-  ask "Link tải Android (https://… — 'none' = bỏ, quay lại Play)" "${cur:-none}"
+  info "link DỰ PHÒNG cho mọi env — popup Android mở link này khi:"
+  info "  · update chính app mà app không có trên Play"
+  info "  · app chết / bị ép mà không có app thay thế, hoặc app thay thế không có trên Play"
+  info "mỗi lần sinh manifest tool kiểm Play + link này 1 lần; hỏng → báo ĐỎ ở dòng cuối"
+  info "đang đặt: ${cur:-(chưa)}"
+  ask "Link tải Android (https://… — 'none' = bỏ)" "${cur:-none}"
   local url="$REPLY"
   reg android-url "$url" || return 1
   after_write "link tải Android → $url"
@@ -934,22 +944,14 @@ menu_block() {
 
 # App thay thế CHUNG (chỉ prod), mỗi platform 1 app: app chết → mời sang;
 # app bị ép (cấm patch cũ / bắt cập nhật) mà store không có bản cao hơn → ép sang.
-# Android chỉ dùng 1 trong 2: app thay thế chung ([10][2]) HOẶC link tải ([10][3]) —
-# đặt cái này thì cái kia bị bỏ.
 menu_replacement() {
-  local a i url
-  url="$(reg android-url)" || return 1
+  local a i
   info "app thay thế chung chỉ áp cho env prod — chọn app prod đang có bản live"
-  if [ -n "$url" ]; then
-    info "Android đang dùng link tải $url — chọn 1 app = BỎ link; bỏ trống = giữ link"
-  fi
+  info "Android: app thay thế không có trên Play → tự dùng link tải Android ([10] → Link tải Android)"
   pick_redirect android - prod; a="$REDIRECT"
   pick_redirect ios - prod; i="$REDIRECT"
-  if [ -n "$a" ] && [ -n "$url" ]; then
-    yes_no "Đặt $a làm app thay thế Android và BỎ link tải $url?" N || { info "huỷ"; return 0; }
-  fi
   reg replacement-app --android "${a:-none}" --ios "${i:-none}" || return 1
-  after_write "app thay thế chung android→${a:-${url:-none}} ios→${i:-none}"
+  after_write "app thay thế chung android→${a:-none} ios→${i:-none}"
 }
 
 menu_retract() {

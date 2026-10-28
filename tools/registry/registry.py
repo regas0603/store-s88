@@ -42,9 +42,9 @@ Lệnh (dynpub.sh wizard gọi; gọi tay khi cần):
                                           (rejected chỉ từ submitted → bỏ khỏi store/, bản trước giữ nguyên)
   bundle-add <bundle> [--env E] | bundle-retire <bundle> | bundle-activate <bundle>
   replacement-app --android B|none --ios B|none
-  android-url [https://…|none]          (không tham số = in link đang đặt; đặt link = bỏ app
-                                          thay thế chung Android và ngược lại — chỉ dùng 1) link tải Android CHUNG mọi env (APK / trang chủ) thay
-                                          market:// — update chính app, app chết, bị ép đều mở link này
+  android-url [https://…|none]          link tải Android CHUNG mọi env (APK / trang chủ) — DỰ PHÒNG:
+                                          app (hoặc app thay thế) không có trên Play / không có app
+                                          thay thế → mở link này. Không tham số = in link đang đặt
                                           app thay thế CHUNG của env prod (mỗi platform 1 app):
                                           app chết / app bị ép mà không có bản cao hơn → mở app này
   set-env <bundle> <env>                 chuyển app sang env khác (config + manifest)
@@ -55,6 +55,7 @@ Lệnh (dynpub.sh wizard gọi; gọi tay khi cần):
   force-vc <bundle> <platform> <below_vc|0>
   block-below <N> --env E [--dry-run]
   retract <N>                             (rút khỏi MỌI env)
+  link-alerts                             in (đỏ) rồi xoá cảnh báo link Android hỏng của lần sinh manifest gần nhất
   apps [--env E]                          tổng quan theo app: sống/chết, store, ABI mới nhất / cũ,
                                           máy nào bị ép / gợi ý → mở app / link nào
   plan [--env E] [--bundle B] | regen | validate | check-links
@@ -69,11 +70,14 @@ import gzip
 import hashlib
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor
 import re
 import shlex
 import shutil
+import ssl
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.request
 
@@ -102,6 +106,12 @@ MODULE_NAME = os.environ.get("DYNPUSH_MODULE_NAME", "app_content")
 OFFLINE = os.environ.get("REGISTRY_OFFLINE") == "1"
 # Env có manifest/config đổi mà chưa deploy (dynpub.sh hỏi deploy đúng các env này).
 CHANGED_FILE = os.environ.get("REGISTRY_CHANGED_FILE", os.path.join(ROOT, "dist", ".dynpub_changed_envs"))
+# Trạng thái link Android (Play của từng app + link tải chung) — kiểm 1 lần mỗi
+# lượt sinh manifest, dùng lại trong LINK_TTL giây. Cảnh báo link hỏng ghi ra
+# LINK_ALERTS → dynpub.sh in đỏ ở dòng cuối khi thoát.
+LINK_CACHE = os.environ.get("REGISTRY_LINK_CACHE", os.path.join(ROOT, "dist", ".link_status.json"))
+LINK_ALERTS = os.environ.get("REGISTRY_LINK_ALERTS", os.path.join(ROOT, "dist", ".dynpub_link_alerts"))
+LINK_TTL = int(os.environ.get("REGISTRY_LINK_TTL", "600"))
 
 PLATFORMS = ("android", "ios")
 STORE_STATES = ("built", "submitted", "live", "removed", "rejected")
@@ -697,9 +707,28 @@ class Registry:
 
 
 # ════════════════════════════════════════════════════════════ Store links
+def _ssl_ctx():
+    """Python cài từ python.org (macOS) chưa chạy "Install Certificates" → không
+    có kho CA → mọi https lỗi verify. Dùng certifi nếu có, không thì kho của
+    macOS (/etc/ssl/cert.pem)."""
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        pass
+    paths = ssl.get_default_verify_paths()
+    if not any(x and os.path.exists(x) for x in (paths.cafile, paths.capath, paths.openssl_cafile)) \
+            and os.path.isfile("/etc/ssl/cert.pem"):
+        return ssl.create_default_context(cafile="/etc/ssl/cert.pem")
+    return ssl.create_default_context()
+
+
+SSL_CTX = _ssl_ctx()
+
+
 def _http_get(url, timeout=8):
     req = urllib.request.Request(url, headers={"User-Agent": "dynpub-registry/1"})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
+    with urllib.request.urlopen(req, timeout=timeout, context=SSL_CTX) as r:
         return r.status, r.read()
 
 
@@ -718,6 +747,168 @@ def lookup_ios_app_id(bundle, countries):
     return None
 
 
+def play_url(bundle):
+    return f"market://details?id={bundle}"
+
+
+def probe_link(url):
+    """Kiểm 1 link → (state, chi tiết). state: ok | dead (không có trên store /
+    404) | blocked (403 / 451 / không kết nối được) | unknown (lỗi phía mình /
+    store trả mã lạ — không kết luận). Không đọc body (link APK có thể rất to)."""
+    def get(u):
+        req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0 dynpub-registry/1"})
+        with urllib.request.urlopen(req, timeout=8, context=SSL_CTX) as r:
+            return r.status
+    if url.startswith("market://details?id="):
+        try:
+            get(f"https://play.google.com/store/apps/details?id={url.split('id=', 1)[1]}&hl=en")
+            return "ok", "có trên Play"
+        except urllib.error.HTTPError as e:
+            return ("dead", "không có trên Play") if e.code == 404 else ("unknown", f"Play trả HTTP {e.code}")
+        except Exception as e:
+            return "unknown", f"không gọi được Play ({e})"
+    m = re.search(r"apps\.apple\.com/.*/id(\d+)", url)
+    if m:
+        try:
+            _, body = _http_get(f"https://itunes.apple.com/lookup?id={m.group(1)}")
+            return ("ok", "có trên App Store") if json.loads(body.decode()).get("resultCount") \
+                else ("dead", "không có trên App Store")
+        except Exception as e:
+            return "unknown", f"không gọi được iTunes ({e})"
+    if url.startswith(("http://", "https://")):
+        try:
+            return "ok", f"HTTP {get(url)}"
+        except urllib.error.HTTPError as e:
+            if e.code in (404, 410):
+                return "dead", f"HTTP {e.code}"
+            if e.code in (401, 403, 451):
+                return "blocked", f"bị chặn (HTTP {e.code})"
+            return "unknown", f"HTTP {e.code}"
+        except Exception as e:
+            reason = getattr(e, "reason", e)
+            if isinstance(reason, ssl.SSLCertVerificationError) and "local issuer" in str(reason):
+                return "unknown", f"máy chạy tool thiếu kho chứng chỉ SSL ({reason})"
+            return "blocked", f"không truy cập được — bị chặn / sai domain? ({reason})"
+    return "unknown", "link lạ"
+
+
+class LinkState:
+    """Trạng thái link Android, đọc / ghi LINK_CACHE. Lệnh ghi (sinh manifest)
+    bật `probe` → evaluate() kiểm MỌI link Android 1 lần (song song) trước khi
+    tính; lệnh chỉ xem (plan / apps) chỉ đọc cache. Không kiểm được → giữ
+    trạng thái cũ (không lật link vì mạng chập chờn)."""
+
+    def __init__(self):
+        self.data = None
+        self.probe = False
+        self.done = False
+
+    def _load(self):
+        if self.data is None:
+            self.data = read_json(LINK_CACHE, {}) or {}
+        return self.data
+
+    def get(self, url):
+        return self._load().get(url) or {}
+
+    def dead(self, url):
+        return self.get(url).get("state") == "dead"
+
+    def record(self, url, state, detail):
+        d = self._load()
+        if state == "unknown" and d.get(url, {}).get("state"):
+            d[url] = dict(d[url], last_error=detail)  # giữ kết luận cũ, lần sau kiểm lại
+        else:
+            d[url] = {"state": state, "detail": detail, "at": int(time.time())}
+
+    def save(self):
+        write_json(LINK_CACHE, self._load())
+
+    def refresh(self, urls):
+        if self.done or not self.probe or OFFLINE:
+            return
+        self.done = True
+        now, d = time.time(), self._load()
+        todo = sorted(u for u in set(urls) if now - (d.get(u) or {}).get("at", 0) > LINK_TTL)
+        if not todo:
+            return
+        info(f"kiểm {len(todo)} link Android (Play / link tải)…")
+        with ThreadPoolExecutor(max_workers=8) as ex:
+            for u, (st, det) in zip(todo, ex.map(probe_link, todo)):
+                self.record(u, st, det)
+        self.save()
+
+
+LINKS = LinkState()
+
+
+def android_link_targets(reg):
+    """Mọi link Android có thể vào manifest: Play của app có bản Android trên
+    store, Play của app thay thế chung Android, link tải chung."""
+    urls = {play_url(b) for b, bd in reg.builds() if bd["platform"] == "android"}
+    dest = (reg.policy_for(REPLACE_ENV).get("replacement_app") or {}).get("android")
+    if dest:
+        urls.add(play_url(dest))
+    if reg.policy.get("android_url"):
+        urls.add(reg.policy["android_url"])
+    return urls
+
+
+def link_alerts(reg, ev):
+    """Cảnh báo 2 đường dự phòng Android (đọc LINKS — đã kiểm lúc evaluate):
+    app thay thế chung (chưa đặt / không có trên Play) và link tải (chưa đặt /
+    404 / bị chặn). Thiếu hoặc hỏng cái nào → báo cái đó."""
+    if not any(bd["platform"] == "android" for _, bd in reg.builds()):
+        return []
+    out = []
+    link = reg.policy.get("android_url")
+    used = {}
+    for e, res in ev.envs.items():
+        for (b, p, vc), r in res.rows.items():
+            if p == "android" and r["url"]:
+                used.setdefault(r["url"], set()).add(e)
+    link_ok = bool(link) and LINKS.get(link).get("state") not in ("dead", "blocked")
+    dest = (reg.policy_for(REPLACE_ENV).get("replacement_app") or {}).get("android")
+    if not dest:
+        out.append("chưa có app thay thế chung Android ([10] → App thay thế chung)")
+    elif LINKS.dead(play_url(dest)):
+        out.append(f"app thay thế chung Android {dest}: KHÔNG có trên Play"
+                   + (" → đang dùng link tải" if link_ok else ""))
+    if not link:
+        # App của mình không có trên Play → máy được mời đang mở trang Play trống.
+        stuck = sorted({b for b, bd in reg.builds() if bd["platform"] == "android"
+                        and LINKS.dead(play_url(b)) and play_url(b) in used})
+        out.append("chưa có link tải Android ([10] → Link tải Android)"
+                   + (f" — {', '.join(stuck)} không có trên Play, popup đang mở trang Play trống" if stuck else ""))
+    elif not link_ok:
+        out.append(f"link tải Android {link}: {LINKS.get(link).get('detail')}"
+                   + (f" — đang dùng ở {', '.join(sorted(used[link]))}" if link in used else ""))
+    return out
+
+
+def write_link_alerts(lines):
+    if lines:
+        os.makedirs(os.path.dirname(LINK_ALERTS), exist_ok=True)
+        with open(LINK_ALERTS, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
+    elif os.path.isfile(LINK_ALERTS):
+        os.remove(LINK_ALERTS)
+
+
+def print_link_alerts():
+    """In cảnh báo link (đỏ) rồi xoá — dynpub.sh gọi lúc thoát; chạy `reg …` lẻ thì in cuối lệnh."""
+    if not os.path.isfile(LINK_ALERTS):
+        return
+    with open(LINK_ALERTS, encoding="utf-8") as f:
+        lines = [x for x in f.read().splitlines() if x.strip()]
+    os.remove(LINK_ALERTS)
+    if lines:
+        print()
+        print(f"{RED}══ LINK ANDROID HỎNG ══{RST}")
+        for x in lines:
+            print(f"  {RED}✗ {x}{RST}")
+
+
 class Links:
     """Sinh link store của 1 bundle. iOS cần Apple ID số: khai tay
     (`ios_app_id`) hoặc tra iTunes 1 lần rồi ghi lại vào bundles.json."""
@@ -728,9 +919,7 @@ class Links:
 
     def store_url(self, bundle, platform):
         if platform == "android":
-            # Không dùng Play: mọi link Android (update chính app / app thay
-            # thế) mở link tải chung (policy android_url — mọi env).
-            return self.reg.policy.get("android_url") or f"market://details?id={bundle}"
+            return play_url(bundle)
         b = self.reg.bundles.get(bundle) or {}
         app_id = b.get("ios_app_id")
         if not app_id and bundle not in self._tried and bundle in self.reg.bundles:
@@ -814,8 +1003,23 @@ def compute_actions(reg, compat, links):
         return (pol.get("replacement_app") or {}).get(platform)
 
     def fallback_link(platform):
-        """Link tải Android chung (mọi env) — thay app thay thế khi không có."""
+        """Link tải Android chung (mọi env) — dự phòng khi link Play không dùng được."""
         return pol.get("android_url") if platform == "android" else None
+
+    def own_url(b, p):
+        """Link update chính app: Play; app không có trên Play → link tải (nếu có)."""
+        u = links.store_url(b, p)
+        return fallback_link(p) if fallback_link(p) and LINKS.dead(u) else u
+
+    def usable_replacement(b, p):
+        """App thay thế chung — bỏ qua khi chính là app này, hoặc không còn trên
+        Play mà đã có link tải thay."""
+        dest = replacement(p)
+        if not dest or dest == b:
+            return None
+        if fallback_link(p) and LINKS.dead(links.store_url(dest, p)):
+            return None
+        return dest
 
     def check_redirect(dest, platform, label, as_error):
         """App thay thế phải active, có build live trên platform, build đó không bị force."""
@@ -858,14 +1062,15 @@ def compute_actions(reg, compat, links):
             # App còn sống + store có bản cao hơn đạt ngưỡng → update chính nó;
             # không thì sang app thay thế chung (prod).
             if own_ok and bun.get("status") != "retired":
-                row["url"] = links.store_url(b, p)
+                row["url"] = own_url(b, p)
                 row["via"] = "own"
             else:
-                dest = replacement(p)
-                if (not dest or dest == b) and fallback_link(p):
+                dest = usable_replacement(b, p)
+                if not dest and fallback_link(p):
                     row["url"] = fallback_link(p)
                     row["via"] = "link"
-                elif not dest or dest == b:
+                elif not dest:
+                    dest = replacement(p)
                     errors.append(
                         f"{b}/{p}/{vc}: bị force nhưng "
                         + ("app đã chết" if bun.get("status") == "retired" else "store của app chưa có bản cao hơn đạt ngưỡng")
@@ -884,9 +1089,10 @@ def compute_actions(reg, compat, links):
                     f"{b}/{p}/{vc}: bị force nhưng không sinh được link (iOS thiếu ios_app_id?)")
         elif target < latest and pol.get("soft_prompt", True):
             if bun.get("status") == "retired":
-                # App chết: store của nó không dùng được → mời sang app thay thế chung.
-                dest = replacement(p)
-                if dest and dest != b:
+                # App chết: store của nó không dùng được → mời sang app thay thế
+                # chung; không có (hoặc nó không còn trên Play) → link tải Android.
+                dest = usable_replacement(b, p)
+                if dest:
                     ck = (dest, p, "soft")
                     if ck not in checked:
                         checked[ck] = check_redirect(dest, p, f"soft {b} → {dest}", False)
@@ -897,7 +1103,7 @@ def compute_actions(reg, compat, links):
                     row.update(action="soft", url=fallback_link(p), via="link",
                                why=f"chạy tới v{target}, app đã chết → mời tải link Android")
             elif store_max > target:
-                row.update(action="soft", url=links.store_url(b, p), via="own",
+                row.update(action="soft", url=own_url(b, p), via="own",
                            why=f"chạy tới v{target}, store đã có bản chạy tới v{store_max}")
             if row["action"] == "soft" and not row["url"]:
                 warnings.append(f"{b}/{p}/{vc}: SOFT nhưng không sinh được link → không mời")
@@ -1104,6 +1310,7 @@ def evaluate_env(reg, env, check_files=True, members=None):
 
 
 def evaluate(reg, check_files=True, only=None):
+    LINKS.refresh(android_link_targets(reg))
     envs = load_envs()
     cfgs = all_app_cfgs()
     warnings, errors = [], []
@@ -1179,6 +1386,7 @@ def commit(reg, ev):
             changed.append(e)
             ok(f"[{e}] {os.path.relpath(manifest_dir(e), ROOT)}/: {'; '.join(wrote)}")
     prune_publish(ev)
+    write_link_alerts(link_alerts(reg, ev))
     if changed:
         mark_changed(*changed)
     else:
@@ -1260,7 +1468,8 @@ def app_overview(reg, res):
             out.append(dict(base, platform="-", abi="no_build"))
             continue
         for p in plats:
-            row = dict(base, platform=p, abi="no_live", moves=[])
+            row = dict(base, platform=p, abi="no_live", moves=[],
+                       play=LINKS.get(play_url(b)).get("state") if p == "android" else None)
             in_store = [bd for _, bd in reg.builds(b) if bd["platform"] == p]
             if in_store:
                 nb = max(in_store, key=lambda x: x["version_code"])
@@ -1321,7 +1530,13 @@ def print_app_overview(reg, res):
         for m in r["moves"]:
             kind = RED + "ÉP" + RST if m["action"] == "force" else YEL + "gợi ý" + RST
             dest = ("chính app" if m["dest"] == r["bundle"] else m["dest"] or "link tải Android")
+            if m["dest"] and m["url"] == reg.policy.get("android_url"):
+                dest += " (không có trên Play → link tải)"
             sub.append(f"máy {', '.join('vc' + str(v) for v in m['vcs'])}: {kind} → {dest}  {DIM}{m['url']}{RST}")
+        if r.get("play") == "dead":
+            sub.append(RED + "không có trên Play" + RST
+                       + (f" → mở link tải {reg.policy['android_url']}" if reg.policy.get("android_url")
+                          else RED + " — chưa có link tải Android ([10] → Link tải Android)" + RST))
         if r["dead"] and not r["moves"] and r["store"]:
             sub.append(RED + "không mời / ép ai — "
                        + ("chưa có app thay thế chung (menu [10])" if reg.env == REPLACE_ENV
@@ -1545,45 +1760,21 @@ def check_links(reg):
         warn("không có link nào để kiểm (chưa app nào có bản live kèm link store)")
         return 0
     for url, p, b in sorted(targets):
-        alive = _link_alive(url, p)
-        if alive is None:
-            warn(f"{url}  không kiểm được (mạng / store trả mã lạ) — thử lại sau")
-        elif alive:
+        st, detail = probe_link(url)
+        if p == "android":
+            LINKS.record(url, st, detail)
+        if st == "unknown":
+            warn(f"{url}  không kiểm được ({detail}) — thử lại sau")
+        elif st == "ok":
             ok(f"{url}  sống")
         else:
-            bad(f"{url}  KHÔNG mở được (app bị gỡ?)")
+            bad(f"{url}  {detail}")
             dead += 1
+    LINKS.save()
     if dead:
-        raise RegError(f"{dead} link chết — sửa trước khi user bấm vào (menu [6]/[9]/[8])")
+        raise RegError(f"{dead} link hỏng — sửa trước khi user bấm vào (menu [6] / [9] / [10]); "
+                       "chạy lại thao tác ghi bất kỳ (vd `reg regen`) để manifest tự chuyển sang link còn lại")
     return len(targets)
-
-
-def _link_alive(url, platform):
-    if url.startswith("market://details?id="):
-        bid = url.split("id=", 1)[1]
-        try:
-            status, _ = _http_get(f"https://play.google.com/store/apps/details?id={bid}&hl=en")
-            return status == 200
-        except urllib.error.HTTPError as e:
-            return False if e.code == 404 else None
-        except Exception:
-            return None
-    if url.startswith(("http://", "https://")) and "apps.apple.com" not in url:
-        try:
-            status, _ = _http_get(url)
-            return status < 400
-        except urllib.error.HTTPError as e:
-            return False if e.code in (404, 410) else None
-        except Exception:
-            return None
-    m = re.search(r"/id(\d+)", url)
-    if m:
-        try:
-            _, body = _http_get(f"https://itunes.apple.com/lookup?id={m.group(1)}")
-            return bool(json.loads(body.decode()).get("resultCount"))
-        except Exception:
-            return None
-    return None
 
 
 # ════════════════════════════════════════════════════════════ CLI
@@ -1766,7 +1957,12 @@ def main(argv):
         print(__doc__)
         return 0
     cmd, a = argv[0], list(argv[1:])
+    if cmd == "link-alerts":
+        print_link_alerts()
+        return 0
     reg = Registry.load()
+    # Lệnh ghi (sinh lại manifest) kiểm link Android 1 lần; lệnh chỉ xem đọc cache.
+    LINKS.probe = cmd not in ("plan", "apps", "validate", "redirect-candidates", "check-links")
 
     if cmd == "list-bundles":
         cfgs = all_app_cfgs()
@@ -2017,9 +2213,6 @@ def main(argv):
                     raise RegError(f"{dest} đã đánh dấu chết — không làm app thay thế được")
                 if not store_build(sc, dest, p):
                     raise RegError(f"{dest} chưa có bản {p} live trên store")
-                if p == "android" and reg.policy.pop("android_url", None):
-                    # Android chỉ dùng 1 trong 2: app thay thế chung HOẶC link tải.
-                    info("bỏ link tải Android (Android chỉ dùng 1: app thay thế chung hoặc link tải)")
             ra[p] = dest
             info(f"app thay thế chung {p}: {dest or '(bỏ trống)'}")
         reg.set_policy(env=REPLACE_ENV, replacement_app=ra)
@@ -2029,15 +2222,10 @@ def main(argv):
             raise RegError(f"link lạ: {url} (dạng https://…)")
         if url:
             reg.policy["android_url"] = url
-            ra = (reg.policy.get("envs") or {}).get(REPLACE_ENV, {}).get("replacement_app") or {}
-            if ra.get("android"):
-                # Android chỉ dùng 1 trong 2: link tải HOẶC app thay thế chung.
-                info(f"bỏ app thay thế chung Android ({ra['android']}) — Android chỉ dùng 1: link tải hoặc app thay thế")
-                reg.set_policy(env=REPLACE_ENV, replacement_app=dict(ra, android=None))
         else:
             reg.policy.pop("android_url", None)
         reg.dirty.add("policy.json")
-        info(f"link tải Android (mọi env): {url or '(bỏ — quay lại market:// của Play)'}")
+        info(f"link tải Android (mọi env, dự phòng): {url or '(bỏ)'}")
     elif cmd == "bundle-activate":
         reg.set_bundle(a[0], status="active")
     elif cmd == "ios-app-id":
@@ -2156,7 +2344,10 @@ def main(argv):
 
 if __name__ == "__main__":
     try:
-        sys.exit(main(sys.argv[1:]))
+        rc = main(sys.argv[1:])
     except RegError as e:
         bad(str(e))
-        sys.exit(1)
+        rc = 1
+    if os.environ.get("DYNPUB_RUN") != "1":  # chạy `reg …` lẻ: in cảnh báo link ở cuối lệnh
+        print_link_alerts()
+    sys.exit(rc)

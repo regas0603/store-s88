@@ -51,6 +51,9 @@ def setup_env_files(tmp):
     R.DEPLOY_FILE = os.path.join(tmp, "configs", "deploy.json")
     R.ARCHIVE = os.path.join(tmp, "archive")
     R.CHANGED_FILE = os.path.join(tmp, "changed")
+    R.LINK_CACHE = os.path.join(tmp, "link_status.json")
+    R.LINK_ALERTS = os.path.join(tmp, "link_alerts")
+    R.LINKS = R.LinkState()
     os.makedirs(R.RUNTIME_CFG_DIR)
     os.makedirs(os.path.join(R.PUBLISH, "patches"))
     with open(R.DEPLOY_FILE, "w") as f:
@@ -263,41 +266,86 @@ class ScenarioTest(Base):
         m = a[("com.example.hostA", "android")]["moves"]
         self.assertEqual([(x["action"], x["dest"]) for x in m], [("force", "com.example.hostD")])
 
-    def test_android_url_replaces_play_everywhere(self):
+    def play_dead(self, *bundles):
+        for b in bundles:
+            R.LINKS.record(R.play_url(b), "dead", "không có trên Play")
+
+    def test_android_url_is_fallback_when_not_on_play(self):
         url = "https://dl.example.com/app"
         self._v14()
         self.reg.policy["android_url"] = url
         self.reg.set_bundle("com.example.hostA", status="retired")
-        for env in ("staging", "pre"):  # link chung → cả env không có app thay thế
-            self.build("com.example.stg", "android", 3, provides(), env=env)
-            self.reg.add_patch(self.reg.patches[14]["file"], self.reg.patches[14]["hash"],
-                               self.reg.patches[14]["size"], requires(lottie="3.7.0"), envs=[env])
-            self.reg.set_bundle("com.example.stg", status="retired")
-            r = self.ev(env).rows[("com.example.stg", "android", 3)]
-            self.assertEqual((r["action"], r["url"], r["via"]), ("soft", url, "link"), env)
+        self.reg.set_policy(env="prod", replacement_app={"android": "com.example.hostD", "ios": "com.example.hostD"})
+        self.reg.set_store("com.example.host1", "android", 13, "live")
+        # còn trên Play → vẫn dùng Play (link tải chỉ là dự phòng)
+        res = self.ev()
+        self.assertEqual(self.row(res, "com.example.host1", "android", 12)["url"], R.play_url("com.example.host1"))
+        self.assertEqual(self.row(res, "com.example.hostA", "android", 12)["url"], R.play_url("com.example.hostD"))
+        # chính app + app thay thế không có trên Play → link tải
+        self.play_dead("com.example.host1", "com.example.hostD")
         res = self.ev()
         self.assertEqual(res.errors, [])
-        # app sống, store có bản cao hơn → update chính nó, nhưng mở link chung
         h = self.row(res, "com.example.host1", "android", 12)
         self.assertEqual((h["action"], h["url"], h["via"]), ("soft", url, "own"))
-        # app chết, không có app thay thế chung → link chung
         a = self.row(res, "com.example.hostA", "android", 12)
         self.assertEqual((a["action"], a["url"], a["via"]), ("soft", url, "link"))
-        # bị ép, không có bản cao hơn / app thay thế → link chung thay vì lỗi "kẹt"
+        self.assertEqual(self.row(res, "com.example.hostA", "ios", 9)["url"], "https://apps.apple.com/app/id999")
+        # bị ép, app thay thế không có trên Play → link tải (không còn "kẹt")
         self.reg.set_policy(env="prod", min_allowed_patch=8)
         res = self.ev()
         self.assertFalse([e for e in res.errors if "/android/" in e])
-        self.assertTrue(any("hostA/ios/9" in e and "kẹt" in e for e in res.errors))  # iOS vẫn cần app thay thế
         a = self.row(res, "com.example.hostA", "android", 12)
         self.assertEqual((a["action"], a["url"], a["via"]), ("force", url, "link"))
-        mv = {(r["bundle"], r["platform"]): r for r in R.app_overview(self.reg.scoped("prod"), res)}
-        self.assertEqual(mv[("com.example.hostA", "android")]["moves"][0]["dest"], None)
-        # iOS không đổi
-        i = self.row(res, "com.example.hostA", "ios", 9)
-        self.assertNotEqual(i["url"], url)
 
-    def test_android_url_and_replacement_exclusive(self):
-        """Android chỉ dùng 1: đặt link tải = bỏ app thay thế Android, và ngược lại."""
+    def test_android_url_covers_envs_without_replacement(self):
+        url = "https://dl.example.com/app"
+        self._v14()
+        self.reg.policy["android_url"] = url
+        for env in ("staging", "pre"):
+            self.build("com.example.stg", "android", 3, provides(), env=env)
+            p14 = self.reg.patches[14]
+            self.reg.add_patch(p14["file"], p14["hash"], p14["size"], requires(lottie="3.7.0"), envs=[env])
+            self.reg.set_bundle("com.example.stg", status="retired")
+            r = self.ev(env).rows[("com.example.stg", "android", 3)]
+            self.assertEqual((r["action"], r["url"], r["via"]), ("soft", url, "link"), env)
+
+    def test_link_alerts(self):
+        url = "https://dl.example.com/app"
+        self._v14()
+        self.play_dead("com.example.host1", "com.example.hostD")
+        alerts = lambda: R.link_alerts(self.reg, R.evaluate(self.reg))  # noqa: E731
+        # chưa có cả 2 → 2 dòng; host1 không có trên Play mà máy vc12 đang bị mời
+        al = alerts()
+        self.assertEqual(len(al), 2, al)
+        self.assertTrue(al[0].startswith("chưa có app thay thế chung Android"), al)
+        self.assertTrue(al[1].startswith("chưa có link tải Android"), al)
+        self.assertIn("com.example.host1 không có trên Play", al[1])
+        # đủ cả 2, đều dùng được → không báo
+        self.reg.policy["android_url"] = url
+        R.LINKS.record(url, "ok", "HTTP 200")
+        self.reg.set_policy(env="prod", replacement_app={"android": "com.example.hostA"})
+        self.assertEqual(alerts(), [])
+        # app thay thế không có trên Play
+        self.reg.set_policy(env="prod", replacement_app={"android": "com.example.hostD"})
+        self.assertEqual(alerts(), ["app thay thế chung Android com.example.hostD: KHÔNG có trên Play → đang dùng link tải"])
+        # link tải 404 → cả 2 hỏng
+        R.LINKS.record(url, "dead", "HTTP 404")
+        al = alerts()
+        self.assertEqual(al[0], "app thay thế chung Android com.example.hostD: KHÔNG có trên Play")
+        self.assertTrue(al[1].startswith(f"link tải Android {url}: HTTP 404"), al)
+        R.write_link_alerts(al)
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            R.print_link_alerts()
+        self.assertIn("LINK ANDROID HỎNG", out.getvalue())
+        self.assertFalse(os.path.exists(R.LINK_ALERTS))  # in xong thì xoá
+
+    def test_unknown_keeps_previous_state(self):
+        R.LINKS.record("u", "dead", "404")
+        R.LINKS.record("u", "unknown", "timeout")
+        self.assertTrue(R.LINKS.dead("u"))
+
+    def test_android_url_and_replacement_both_kept(self):
         self._v14()
         self.reg.save()
         root, load = self.reg.root, R.Registry.load
@@ -309,17 +357,12 @@ class ScenarioTest(Base):
                 self.assertEqual(R.main(list(args)), 0)
             return load(root).policy
 
-        pol = run("replacement-app", "--android", "com.example.hostD", "--ios", "com.example.hostD")
-        self.assertEqual(pol["envs"]["prod"]["replacement_app"]["android"], "com.example.hostD")
+        run("replacement-app", "--android", "com.example.hostD", "--ios", "com.example.hostD")
         pol = run("android-url", url)
         self.assertEqual(pol["android_url"], url)
-        self.assertIsNone(pol["envs"]["prod"]["replacement_app"]["android"])
-        self.assertEqual(pol["envs"]["prod"]["replacement_app"]["ios"], "com.example.hostD")  # iOS giữ nguyên
-        pol = run("replacement-app", "--android", "none", "--ios", "com.example.hostD")
-        self.assertEqual(pol.get("android_url"), url)  # bỏ trống Android → giữ link
-        pol = run("replacement-app", "--android", "com.example.hostD", "--ios", "com.example.hostD")
-        self.assertNotIn("android_url", pol)
         self.assertEqual(pol["envs"]["prod"]["replacement_app"]["android"], "com.example.hostD")
+        pol = run("replacement-app", "--android", "com.example.hostD", "--ios", "com.example.hostD")
+        self.assertEqual(pol["android_url"], url)
 
     def test_retract_lowers_target(self):
         self._v14()

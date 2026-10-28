@@ -35,8 +35,10 @@ Chỉ cần chạy `bash tools/dynpub.sh` rồi chọn số — không truyền 
 ── Ít dùng
 [9] Quản lý app                    thêm app / đánh dấu app chết / Apple ID / đổi env
 [10] Link / app thay thế           [1] kiểm link (cron) · [2] app thay thế chung (prod, bundle Android / iOS)
-                                   · [3] link tải Android (APK / trang chủ, MỌI env) — thay market:// khi app Android không lên Play
-                                   Android chỉ dùng 1 trong [2] / [3] — đặt cái này thì cái kia bị bỏ
+                                   · [3] link tải Android (APK / trang chủ, MỌI env) — dự phòng: app / app thay thế không có
+                                     trên Play, hoặc không có app thay thế → mở link này
+                                   Mỗi lần sinh manifest tool kiểm link Android 1 lần (Play từng app + link tải, cache 10 phút);
+                                   link hỏng (không có trên Play / 404 / bị chặn) → in ĐỎ ở dòng cuối khi tool chạy xong
 [11] Đổi package host (ABI)
 [12] Đổi rs_domain của env
 [13] Đổi api_domain của env
@@ -61,7 +63,7 @@ không patch tới khi [6] + deploy ở máy có VPN.
 | Build release | máy build: [5] (tự commit, push để máy deploy kéo về) → nộp store → máy có VPN: [6] `submitted` → deploy → duyệt xong [6] `live` → deploy |
 | Ra patch | `check.sh` → [1] → chọn env (vd staging) → xem bảng compat → deploy → [4] đưa lên pre / prod |
 | Patch đổi package host | [1] báo FAIL ràng buộc version → [11] nhận version mới (pub get + chụp mốc + commit lock) → [5] build lại các app còn update được → [6] khi lên store → [1] → deploy |
-| Android không lên Play | [10] → Link tải Android → nhập link APK / trang chủ (1 lần, áp cả staging / pre / prod). Mọi popup Android (update chính app, app chết, bị ép) mở link này; đặt link = bỏ app thay thế chung Android (và ngược lại: [10] → App thay thế chung chọn app Android = bỏ link). `none` = quay lại Play |
+| Android không lên Play | [10] → Link tải Android → nhập link APK / trang chủ (1 lần, áp cả staging / pre / prod). Mỗi lần sinh manifest tool kiểm Play của từng app: app không có trên Play → popup Android của app đó mở link tải; app thay thế chung không có trên Play / không có app thay thế → link tải. Có thể đặt CẢ app thay thế lẫn link tải. `none` = bỏ |
 | App chết (bị gỡ / không update được nữa) | [10] → App thay thế chung (1 lần, prod) → [9] → đánh dấu app chết (user được mời sang app thay thế, từ chối được) |
 | Cấm patch cũ | [8] → Cấm patch cũ → N → xem trước → áp dụng. Máy bị cấm: update chính app nếu store có bản live chạy được >= N, không thì app thay thế chung |
 | Ép update vì lỗi app | build bản sửa → `live` → [8] → Bắt cập nhật theo version_code (không có bản cao hơn → app thay thế chung) |
